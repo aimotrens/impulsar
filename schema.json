@@ -1,0 +1,164 @@
+{
+  "$id": "https://github.com/aimotrens/impulsar",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "markdownDescription": "impulsar is a tool.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "patternProperties": {
+    "^.+$": {
+      "$ref": "#/definitions/job"
+    }
+  },
+  "definitions": {
+    "job": {
+      "type": "object",
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "not": {
+                "required": [
+                  "jobs"
+                ]
+              }
+            },
+            {
+              "not": {
+                "required": [
+                  "jobs:pre"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "required": [
+            "jobs"
+          ],
+          "not": {
+            "required": [
+              "jobs:pre"
+            ]
+          }
+        },
+        {
+          "required": [
+            "jobs:pre"
+          ],
+          "not": {
+            "required": [
+              "jobs"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "shell": {
+          "$ref": "#/definitions/shell"
+        },
+        "jobs": {
+          "type": "array",
+          "markdownDescription": "Alias für jobs:pre.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "jobs:pre": {
+          "type": "array",
+          "markdownDescription": "Jobs, die vor dem Script ausgeführt werden.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "jobs:post": {
+          "type": "array",
+          "markdownDescription": "Jobs, die nach dem Script ausgeführt werden.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "script": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "workDir": {
+          "type": "string"
+        }
+      }
+    },
+    "shell": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "const": "docker"
+            },
+            "image": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "image"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "not": {
+                "const": "docker"
+              }
+            }
+          },
+          "not": {
+            "required": [
+              "image"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "docker",
+            "bash",
+            "powershell",
+            "pwsh",
+            "custom"
+          ]
+        },
+        "image": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bootCommand": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
