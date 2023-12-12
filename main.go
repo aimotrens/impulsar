@@ -10,7 +10,12 @@ import (
 	"github.com/aimotrens/impulsar/engine"
 	"github.com/aimotrens/impulsar/model"
 	"gopkg.in/yaml.v3"
+
+	_ "embed"
 )
+
+//go:embed bash-autocompletion.sh
+var bashAutoComplete string
 
 type arrayFlags []string
 
@@ -27,12 +32,29 @@ func main() {
 	var impulsarFile string
 	var envVars arrayFlags
 	var dumpJobs bool
+	var showJobs bool
+	var genBashCompletion bool
 
 	flag.StringVar(&impulsarFile, "f", "./impulsar.yml", "impulsar file")
 	flag.Var(&envVars, "e", "environment variables")
 	flag.BoolVar(&dumpJobs, "dump-jobs", false, "verbose")
+	flag.BoolVar(&showJobs, "show-jobs", false, "verbose")
+	flag.BoolVar(&genBashCompletion, "gen-bash-completion", false, "verbose")
 
 	flag.Parse()
+
+	if genBashCompletion {
+		fmt.Println(bashAutoComplete)
+		os.Exit(0)
+	}
+
+	if showJobs {
+		impulsar := loadimpulsarFile(impulsarFile)
+		for key := range impulsar {
+			fmt.Println(key)
+		}
+		os.Exit(0)
+	}
 
 	if flag.NArg() == 0 {
 		fmt.Println("No jobs provided")
