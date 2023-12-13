@@ -42,7 +42,5 @@ build-docker:
 # ---
 
 install:
-  jobs:
-    - build-linux-amd64
   script:
-    - cp -v bin/impulsar_linux_amd64 ${HOME}/.local/bin/impulsar
+    - go install
