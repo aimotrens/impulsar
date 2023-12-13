@@ -6,10 +6,11 @@ build:
 
 .build-binary: &build-binary
   shell:
-    type: bash
+    type: pwsh
   script:
-    - mkdir -p bin
-    - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+    - New-Item -Type Directory -Force bin
+    - go build -o bin/impulsar_$($env:GOOS)_$($env:GOARCH)$($env:EXE_SUFFIX)
+
 
 build-linux-amd64:
   <<: *build-binary

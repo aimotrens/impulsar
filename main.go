@@ -61,6 +61,7 @@ func main() {
 		return
 	}
 
+	envVarsMap := make(map[string]string)
 	for _, v := range envVars {
 		if !strings.Contains(v, "=") {
 			fmt.Println("Invalid variable:", v)
@@ -68,6 +69,7 @@ func main() {
 
 		kv := strings.Split(v, "=")
 		os.Setenv(kv[0], kv[1])
+		envVarsMap[kv[0]] = kv[1]
 	}
 
 	impulsar := loadimpulsarFile(impulsarFile)
@@ -83,7 +85,7 @@ func main() {
 		f.Write(dump)
 	}
 
-	e := engine.New(impulsar, envVars)
+	e := engine.New(impulsar, envVarsMap)
 
 	fmt.Println("Running jobs...")
 	for i := 0; i < flag.NArg(); i++ {

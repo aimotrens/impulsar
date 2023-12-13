@@ -20,10 +20,11 @@ type jobOutputPrefixer struct {
 }
 
 func (s *jobOutputPrefixer) Write(p []byte) (n int, err error) {
+	n = len(p)
+
+	tmpOutput := string(p)
 	if !s.prefixWritten {
-		n = len(p)
-		_, err = fmt.Fprintf(s.Writer,
-			"[%s] (%s)\n%s",
+		tmpOutput = fmt.Sprintf("[%s] (%s)\n%s",
 			s.Job.Name,
 			strings.ReplaceAll(
 				strings.Trim(*s.ScriptLine, "\n"),
@@ -32,18 +33,22 @@ func (s *jobOutputPrefixer) Write(p []byte) (n int, err error) {
 			p,
 		)
 		s.prefixWritten = true
-		return
 	}
 
-	return s.Writer.Write(p)
+	if runtime.GOOS == "windows" && s.Job.Shell.Type == model.SHELL_TYPE_BASH {
+		tmpOutput = strings.ReplaceAll(tmpOutput, "\n", "\r\n")
+	}
+
+	_, err = s.Writer.Write([]byte(tmpOutput))
+	return
 }
 
 type Engine struct {
 	impulsar  model.ImpulsarList
-	variables []string
+	variables map[string]string
 }
 
-func New(d model.ImpulsarList, variables []string) *Engine {
+func New(d model.ImpulsarList, variables map[string]string) *Engine {
 	return &Engine{
 		impulsar:  d,
 		variables: variables,
@@ -88,12 +93,26 @@ func (e *Engine) execShellCommand(j *model.Job, script string) {
 	cmd.Stderr = &jobOutputPrefixer{Job: j, ScriptLine: &script, Writer: os.Stderr}
 	cmd.Env = os.Environ()
 
-	for _, v := range e.variables {
-		cmd.Env = append(cmd.Env, v)
+	for key, value := range e.variables {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
 	}
 
 	for key, value := range j.Variables {
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
+	}
+
+	if runtime.GOOS == "windows" && j.Shell.Type == model.SHELL_TYPE_BASH {
+		var wslEnv []string
+
+		for key := range e.variables {
+			wslEnv = append(wslEnv, key+"/u")
+		}
+
+		for key := range j.Variables {
+			wslEnv = append(wslEnv, key+"/u")
+		}
+
+		cmd.Env = append(cmd.Env, "WSLENV="+strings.Join(wslEnv, ":"))
 	}
 
 	cmd.Dir = j.WorkDir
