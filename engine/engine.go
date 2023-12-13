@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -130,7 +131,7 @@ func (e *Engine) execShellCommand(j *model.Job, script string) {
 
 func (e *Engine) execDockerCommand(j *model.Job, script string) {
 	wd := j.WorkDir
-	if !path.IsAbs(wd) {
+	if !filepath.IsAbs(wd) {
 		currentWorkDir, _ := os.Getwd()
 		wd = path.Join(currentWorkDir, wd)
 	}
