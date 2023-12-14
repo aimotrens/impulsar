@@ -13,6 +13,7 @@ const (
 type Shell struct {
 	Type        string   `yaml:"type"`
 	Image       string   `yaml:"image"`
+	UidGid      string   `yaml:"uidGid"`
 	BootCommand []string `yaml:"bootCommand"`
 }
 

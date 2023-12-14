@@ -139,8 +139,14 @@ func (e *Engine) execDockerCommand(j *model.Job, script string) {
 	currentWorkDir, _ := os.Getwd()
 	args := []string{"run", "--rm", "-v", currentWorkDir + ":/workdir", "--workdir=" + path.Join("/workdir", j.WorkDir)}
 
-	if runtime.GOOS != "windows" {
-		args = append(args, "--user", fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid()))
+	if j.Shell.UidGid != "" {
+		args = append(args, "--user", j.Shell.UidGid)
+	} else {
+		if runtime.GOOS == "windows" {
+			args = append(args, "--user", "1000:1000")
+		} else {
+			args = append(args, "--user", fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid()))
+		}
 	}
 
 	for _, v := range e.variables {

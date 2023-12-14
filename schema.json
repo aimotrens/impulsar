@@ -119,6 +119,10 @@
             "image": {
               "type": "string",
               "minLength": 1
+            },
+            "uidGid": {
+              "type": "string",
+              "pattern": "^[0-9]+:[0-9]+$"
             }
           },
           "required": [
@@ -135,7 +139,7 @@
           },
           "not": {
             "required": [
-              "image"
+              "image", "uidGid"
             ]
           }
         }
@@ -156,6 +160,11 @@
           "type": "string",
           "description": "Das Docker-Image, das verwendet werden soll.",
           "minLength": 1
+        },
+        "uidGid": {
+          "type": "string",
+          "description": "Die UID und GID, die verwendet werden sollen.",
+          "pattern": "^[0-9]+:[0-9]+$"
         },
         "bootCommand": {
           "type": "array",
