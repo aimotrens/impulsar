@@ -45,6 +45,14 @@ func (e *Engine) executeJob(j *model.Job) {
 				os.Exit(1)
 			}
 
+			fmt.Printf("[%s] (%s)\n",
+				j.Name,
+				strings.ReplaceAll(
+					strings.Trim(script, "\n"),
+					"\n",
+					"; "),
+			)
+
 			e.execCommand(j, script)
 		}
 

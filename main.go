@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/aimotrens/impulsar/engine"
@@ -14,8 +15,11 @@ import (
 	_ "embed"
 )
 
-//go:embed bash-autocompletion.sh
-var bashAutoComplete string
+var (
+	//go:embed bash-autocompletion.sh
+	bashAutoComplete string
+	compileDate      string
+)
 
 type arrayFlags []string
 
@@ -47,6 +51,8 @@ func main() {
 		fmt.Println(bashAutoComplete)
 		os.Exit(0)
 	}
+
+	fmt.Printf("Impulsar\nCompiled at %s with %s\n\n", compileDate, runtime.Version())
 
 	if showJobs {
 		impulsar := loadimpulsarFile(impulsarFile)
@@ -87,13 +93,13 @@ func main() {
 
 	e := engine.New(impulsar, envVarsMap)
 
-	fmt.Println("Running jobs...")
+	fmt.Println("Execution plan ...")
 	for i := 0; i < flag.NArg(); i++ {
 		fmt.Println("-", flag.Arg(i))
 	}
+	fmt.Println("")
 
 	for i := 0; i < flag.NArg(); i++ {
-		fmt.Println("Starting job", flag.Arg(i))
 		e.RunJob(flag.Arg(i))
 	}
 }

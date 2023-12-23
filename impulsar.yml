@@ -3,8 +3,6 @@ build:
     - build-linux-amd64
     - build-linux-arm64
     - build-windows-amd64
-    - pack-on-linux
-    - pack-on-windows
 
 .build-binary: &build-binary
   conditional:
@@ -12,12 +10,12 @@ build:
       overwrite:
         script:
           - New-Item -Type Directory -Force bin
-          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X `"main.compileDate=$((get-date).ToLongDateString())`""
     - if: ["env.os === 'linux'"]
       overwrite:
         script:
           - mkdir -p bin
-          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X \"main.compileDate=$(date)\""
   script:
     - echo "Unknown Platform"
     - STOP
@@ -45,18 +43,6 @@ build-windows-amd64:
 
 # ---
 
-pack-on-linux:
-  if: ["env.os === 'linux'"]
-  script:
-    - tar -czvf bin/impulsar.tar.gz bin/impulsar_*
-
-pack-on-windows:
-  if: ["env.os === 'windows'"]
-  script:
-    - 7z a bin/impulsar.zip bin/impulsar_*
-
-# ---
-
 build-docker:
   script:
     - docker build --builder=multiarch --platform=linux/amd64,linux/arm64 -t ${IMAGE} --push .
@@ -64,5 +50,16 @@ build-docker:
 # ---
 
 install:
+  jobs:
+    - install-on-linux
+    - install-on-windows
+
+install-on-linux:
+  if: ["env.os === 'linux'"]
   script:
-    - go install
+    - go install -ldflags "-X \"main.compileDate=$(date)\""
+
+install-on-windows:
+  if: ["env.os === 'windows'"]
+  script:
+    - go install -ldflags "-X `"main.compileDate=$((get-date).ToLongDateString())`""
