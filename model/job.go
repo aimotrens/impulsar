@@ -32,8 +32,6 @@ func (j *Job) SetDefaults() {
 }
 
 func (j *Job) Overwrite(overwrite *Job) error {
-	overwrite.SetDefaults()
-
 	if overwrite.Name != "" {
 		return errors.New("cannot overwrite job name")
 	}
@@ -73,6 +71,8 @@ func (j *Job) Overwrite(overwrite *Job) error {
 	if overwrite.Variables != nil {
 		j.Variables = overwrite.Variables
 	}
+
+	overwrite.SetDefaults()
 
 	return nil
 }
