@@ -2,8 +2,12 @@ package engine
 
 import (
 	"fmt"
+	"os"
+	"runtime"
+	"strings"
 
 	"github.com/aimotrens/impulsar/model"
+	"github.com/dop251/goja"
 )
 
 type Engine struct {
@@ -28,16 +32,20 @@ func (e *Engine) RunJob(job string) {
 }
 
 func (e *Engine) executeJob(j *model.Job) {
-	for _, pre := range j.JobsPre {
-		e.RunJob(pre)
-	}
+	if evaluateIfCondition(e, j) {
+		for _, pre := range j.JobsPre {
+			e.RunJob(pre)
+		}
 
-	for _, script := range j.Script {
-		e.execCommand(j, script)
-	}
+		for _, script := range j.Script {
+			e.execCommand(j, script)
+		}
 
-	for _, post := range j.JobsPost {
-		e.RunJob(post)
+		for _, post := range j.JobsPost {
+			e.RunJob(post)
+		}
+	} else {
+		fmt.Printf("Job %s skipped, no condition matched\n", j.Name)
 	}
 }
 
@@ -62,4 +70,42 @@ func variableMapper(e *Engine, j *model.Job) func(string) string {
 
 		return ""
 	}
+}
+
+func evaluateIfCondition(e *Engine, j *model.Job) bool {
+	if j.If == nil {
+		return true
+	}
+
+	var envVars = make(map[string]string)
+
+	envVars["os"] = runtime.GOOS
+	envVars["arch"] = runtime.GOARCH
+
+	for _, v := range os.Environ() {
+		var kv = strings.Split(v, "=")
+		envVars[strings.ToLower(kv[0])] = kv[1]
+	}
+
+	for key, value := range e.variables {
+		envVars[strings.ToLower(key)] = value
+	}
+
+	for key, value := range j.Variables {
+		envVars[strings.ToLower(key)] = value
+	}
+
+	vm := goja.New()
+
+	vm.Set("env", envVars)
+
+	for _, v := range j.If {
+		res, _ := vm.RunString(v)
+
+		if res.ToBoolean() {
+			return true
+		}
+	}
+
+	return false
 }

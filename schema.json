@@ -85,6 +85,13 @@
             "type": "string"
           }
         },
+        "if": {
+          "type": "array",
+          "description": "Die Bedingungen werden von oben nach unten ausgewertet. Wenn eine Bedingung erfüllt ist, wird der Job ausgeführt.",
+          "items": {
+            "type": "string"
+          }
+        },
         "script": {
           "type": "array",
           "description": "Das Script, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",
@@ -94,14 +101,14 @@
         },
         "variables": {
           "type": "object",
-            "description": "Variablen, die in der Shell gesetzt werden sollen.",
+          "description": "Variablen, die in der Shell gesetzt werden sollen.",
           "additionalProperties": {
             "type": "string"
           }
         },
         "workDir": {
           "type": "string",
-            "description": "Das Arbeitsverzeichnis, in dem das Script ausgeführt werden soll."
+          "description": "Das Arbeitsverzeichnis, in dem das Script ausgeführt werden soll."
         }
       }
     },
@@ -139,7 +146,8 @@
           },
           "not": {
             "required": [
-              "image", "uidGid"
+              "image",
+              "uidGid"
             ]
           }
         }
@@ -168,7 +176,7 @@
         },
         "bootCommand": {
           "type": "array",
-            "description": "Der Befehl, der ausgeführt werden soll, um die Shell zu starten.",
+          "description": "Der Befehl, der ausgeführt werden soll, um die Shell zu starten.",
           "items": {
             "type": "string"
           }

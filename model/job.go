@@ -10,6 +10,7 @@ import (
 type Job struct {
 	Name      string            `yaml:"-"`
 	Shell     *Shell            `yaml:"shell"`
+	If        []string          `yaml:"if"`
 	AllowFail bool              `yaml:"allowFail"`
 	WorkDir   string            `yaml:"workDir"`
 	JobsPre   []string          `yaml:"jobs:pre"`
