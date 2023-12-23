@@ -1,7 +1,7 @@
 #/usr/bin/env bash
-_dothis_completions()
+_impulsar_completions()
 {
   COMPREPLY=($(compgen -W "$(impulsar --show-jobs)" "${COMP_WORDS[1]}"))
 }
 
-complete -F _dothis_completions impulsar
+complete -F _impulsar_completions impulsar

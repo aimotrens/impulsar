@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	//go:embed bash-autocompletion.sh
+	//go:embed shell-completion/bash.sh
 	bashAutoComplete string
 	compileDate      string
 )
