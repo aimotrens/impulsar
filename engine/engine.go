@@ -32,12 +32,19 @@ func (e *Engine) RunJob(job string) {
 }
 
 func (e *Engine) executeJob(j *model.Job) {
+	evaluateConditionalField(e, j)
+
 	if evaluateIfCondition(e, j) {
 		for _, pre := range j.JobsPre {
 			e.RunJob(pre)
 		}
 
 		for _, script := range j.Script {
+			if script == "STOP" {
+				fmt.Printf("Job %s failed, due to STOP command\n", j.Name)
+				os.Exit(1)
+			}
+
 			e.execCommand(j, script)
 		}
 
@@ -77,6 +84,49 @@ func evaluateIfCondition(e *Engine, j *model.Job) bool {
 		return true
 	}
 
+	var envVars = collectEnvVars(e, j)
+
+	vm := goja.New()
+
+	vm.Set("env", envVars)
+
+	for _, v := range j.If {
+		res, _ := vm.RunString(v)
+
+		if res.ToBoolean() {
+			return true
+		}
+	}
+
+	return false
+}
+
+func evaluateConditionalField(e *Engine, j *model.Job) {
+	if j.Conditional == nil {
+		return
+	}
+
+	var envVars = collectEnvVars(e, j)
+
+	vm := goja.New()
+	vm.Set("env", envVars)
+
+	for _, v := range j.Conditional {
+		for _, ifCondition := range v.If {
+			res, _ := vm.RunString(ifCondition)
+
+			if res.ToBoolean() {
+				if v.Overwrite != nil {
+					j.Overwrite(v.Overwrite)
+				}
+
+				return
+			}
+		}
+	}
+}
+
+func collectEnvVars(e *Engine, j *model.Job) map[string]string {
 	var envVars = make(map[string]string)
 
 	envVars["os"] = runtime.GOOS
@@ -95,17 +145,5 @@ func evaluateIfCondition(e *Engine, j *model.Job) bool {
 		envVars[strings.ToLower(key)] = value
 	}
 
-	vm := goja.New()
-
-	vm.Set("env", envVars)
-
-	for _, v := range j.If {
-		res, _ := vm.RunString(v)
-
-		if res.ToBoolean() {
-			return true
-		}
-	}
-
-	return false
+	return envVars
 }

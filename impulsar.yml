@@ -3,14 +3,24 @@ build:
     - build-linux-amd64
     - build-linux-arm64
     - build-windows-amd64
+    - pack-on-linux
+    - pack-on-windows
 
 .build-binary: &build-binary
-  shell:
-    type: pwsh
+  conditional:
+    - if: ["env.os === 'windows'"]
+      overwrite:
+        script:
+          - New-Item -Type Directory -Force bin
+          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+    - if: ["env.os === 'linux'"]
+      overwrite:
+        script:
+          - mkdir -p bin
+          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
   script:
-    - New-Item -Type Directory -Force bin
-    - go build -o bin/impulsar_$($env:GOOS)_$($env:GOARCH)$($env:EXE_SUFFIX)
-
+    - echo "Unknown Platform"
+    - STOP
 
 build-linux-amd64:
   <<: *build-binary
@@ -32,6 +42,18 @@ build-windows-amd64:
     GOOS: windows
     GOARCH: amd64
     EXE_SUFFIX: ".exe"
+
+# ---
+
+pack-on-linux:
+  if: ["env.os === 'linux'"]
+  script:
+    - tar -czvf bin/impulsar.tar.gz bin/impulsar_*
+
+pack-on-windows:
+  if: ["env.os === 'windows'"]
+  script:
+    - 7z a bin/impulsar.zip bin/impulsar_*
 
 # ---
 

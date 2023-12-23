@@ -92,6 +92,12 @@
             "type": "string"
           }
         },
+        "conditional": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/conditional"
+          }
+        },
         "script": {
           "type": "array",
           "description": "Das Script, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",
@@ -180,6 +186,21 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "conditional": {
+      "type": "object",
+      "properties": {
+        "if": {
+          "type": "array",
+          "description": "Die Bedingungen werden von oben nach unten ausgewertet. Wenn eine Bedingung erfüllt ist, wird der Job entsprechend \"overwrite\" angepasst.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "overwrite": {
+          "$ref": "#/definitions/job"
         }
       }
     }

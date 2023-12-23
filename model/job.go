@@ -8,15 +8,16 @@ import (
 )
 
 type Job struct {
-	Name      string            `yaml:"-"`
-	Shell     *Shell            `yaml:"shell"`
-	If        []string          `yaml:"if"`
-	AllowFail bool              `yaml:"allowFail"`
-	WorkDir   string            `yaml:"workDir"`
-	JobsPre   []string          `yaml:"jobs:pre"`
-	JobsPost  []string          `yaml:"jobs:post"`
-	Script    []string          `yaml:"script"`
-	Variables map[string]string `yaml:"variables"`
+	Name        string            `yaml:"-"`
+	Shell       *Shell            `yaml:"shell"`
+	If          []string          `yaml:"if"`
+	Conditional []*Conditional    `yaml:"conditional"`
+	AllowFail   bool              `yaml:"allowFail"`
+	WorkDir     string            `yaml:"workDir"`
+	JobsPre     []string          `yaml:"jobs:pre"`
+	JobsPost    []string          `yaml:"jobs:post"`
+	Script      []string          `yaml:"script"`
+	Variables   map[string]string `yaml:"variables"`
 }
 
 func (j *Job) SetDefaults() {
@@ -28,6 +29,52 @@ func (j *Job) SetDefaults() {
 	if j.WorkDir == "" {
 		j.WorkDir, _ = os.Getwd()
 	}
+}
+
+func (j *Job) Overwrite(overwrite *Job) error {
+	overwrite.SetDefaults()
+
+	if overwrite.Name != "" {
+		return errors.New("cannot overwrite job name")
+	}
+
+	if overwrite.Conditional != nil {
+		return errors.New("cannot overwrite job conditional")
+	}
+
+	if overwrite.Shell != nil {
+		j.Shell = overwrite.Shell
+	}
+
+	if overwrite.If != nil {
+		j.If = overwrite.If
+	}
+
+	if overwrite.AllowFail {
+		j.AllowFail = overwrite.AllowFail
+	}
+
+	if overwrite.WorkDir != "" {
+		j.WorkDir = overwrite.WorkDir
+	}
+
+	if overwrite.JobsPre != nil {
+		j.JobsPre = overwrite.JobsPre
+	}
+
+	if overwrite.JobsPost != nil {
+		j.JobsPost = overwrite.JobsPost
+	}
+
+	if overwrite.Script != nil {
+		j.Script = overwrite.Script
+	}
+
+	if overwrite.Variables != nil {
+		j.Variables = overwrite.Variables
+	}
+
+	return nil
 }
 
 func (j *Job) UnmarshalYAML(v *yaml.Node) error {
