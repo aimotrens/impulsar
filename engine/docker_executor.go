@@ -46,8 +46,8 @@ func (e *Engine) execDockerCommand(j *model.Job, script string) {
 	args = append(args, scriptExpanded)
 
 	cmd := exec.Command("docker", args...)
-	cmd.Stdout = &jobOutputPrefixer{Job: j, ScriptLine: &script, Writer: os.Stdout}
-	cmd.Stderr = &jobOutputPrefixer{Job: j, ScriptLine: &script, Writer: os.Stderr}
+	cmd.Stdout = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
+	cmd.Stderr = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
 	err := cmd.Run()
 
 	if err != nil {

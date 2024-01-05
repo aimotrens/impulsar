@@ -8,13 +8,13 @@ import (
 	"github.com/aimotrens/impulsar/model"
 )
 
-type jobOutputPrefixer struct {
+type jobOutputUnifier struct {
 	Job        *model.Job
 	ScriptLine *string
 	Writer     io.Writer
 }
 
-func (s *jobOutputPrefixer) Write(p []byte) (n int, err error) {
+func (s *jobOutputUnifier) Write(p []byte) (n int, err error) {
 	n = len(p)
 
 	tmpOutput := string(p)

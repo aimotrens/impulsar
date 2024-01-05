@@ -95,7 +95,6 @@ func evaluateIfCondition(e *Engine, j *model.Job) bool {
 	var envVars = collectEnvVars(e, j)
 
 	vm := goja.New()
-
 	vm.Set("env", envVars)
 
 	for _, v := range j.If {
