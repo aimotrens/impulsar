@@ -61,12 +61,6 @@ jobs:
         GOOS=windows GOARCH=arm64 go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o release/impulsar-windows-arm64.exe
         zip release/assets/impulsar-windows-arm64.zip release/impulsar-windows-arm64.exe
 
-        GOOS=darwin GOARCH=amd64 go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o release/impulsar-darwin-amd64
-        tar cvfJ release/assets/impulsar-darwin-amd64.tar.xz release/impulsar-darwin-amd64
-
-        GOOS=darwin GOARCH=arm64 go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o release/impulsar-darwin-arm64
-        tar cvfJ release/assets/impulsar-darwin-arm64.tar.xz release/impulsar-darwin-arm64
-
     - name: Github-Release erstellen
       uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1
       with:
