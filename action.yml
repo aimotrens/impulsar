@@ -1,0 +1,23 @@
+name: "setup-impulsar"
+description: ""
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        ARCH=$(uname -m)
+        if [ "$ARCH" == "x86_64" ]; then
+          ARCH="amd64"
+        elif [ "$ARCH" == "aarch64" ]; then
+          ARCH="arm64"
+        else
+          echo "Unsupported architecture: $ARCH"
+          exit 1
+        fi
+
+        cd /tmp
+        LATEST=$(curl -I https://github.com/aimotrens/impulsar/releases/latest | awk -F '/' '/^location/ {print  substr($NF, 1, length($NF)-1)}')
+        curl -L https://github.com/aimotrens/impulsar/releases/download/${LATEST}/impulsar-linux-${ARCH}.tar.xz | tar xvfJ -
+
+        chmod +x release/impulsar-linux-${ARCH}
+        mv release/impulsar-linux-${ARCH} /usr/local/bin/impulsar
