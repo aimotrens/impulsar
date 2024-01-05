@@ -1,11 +1,13 @@
 FROM golang:1.21 AS builder
 
+ARG IMPULSAR_VERSION
+
 WORKDIR /src
 ADD go.mod go.sum ./
 RUN go mod download
 
 ADD . .
-RUN go build -o impulsar
+RUN go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o impulsar
 
 # ---
 

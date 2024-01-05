@@ -19,6 +19,7 @@ var (
 	//go:embed shell-completion/bash.sh
 	bashAutoComplete string
 	compileDate      string
+	impulsarVersion  string
 )
 
 type arrayFlags []string
@@ -38,6 +39,10 @@ func main() {
 	var dumpJobs bool
 	var showJobs bool
 	var genBashCompletion bool
+	var version bool
+
+	flag.BoolVar(&version, "v", false, "version")
+	flag.BoolVar(&version, "version", false, "version")
 
 	flag.StringVar(&impulsarFile, "f", "./impulsar.yml", "impulsar file")
 	flag.Var(&envVars, "e", "environment variables")
@@ -47,12 +52,17 @@ func main() {
 
 	flag.Parse()
 
+	if version {
+		fmt.Printf("Impulsar %s\nCompiled at %s with %s\n\n", impulsarVersion, compileDate, runtime.Version())
+		os.Exit(0)
+	}
+
 	if genBashCompletion {
 		fmt.Println(bashAutoComplete)
 		os.Exit(0)
 	}
 
-	fmt.Printf("Impulsar\nCompiled at %s with %s\n\n", compileDate, runtime.Version())
+	fmt.Printf("Impulsar %s", impulsarVersion)
 
 	if showJobs {
 		impulsar := loadimpulsarFile(impulsarFile)
