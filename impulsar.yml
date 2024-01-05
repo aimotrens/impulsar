@@ -3,19 +3,20 @@ build:
     - build-linux-amd64
     - build-linux-arm64
     - build-windows-amd64
+    - build-windows-arm64
 
 .build-binary: &build-binary
   conditional:
     - if: ["env.os === 'windows'"]
       overwrite:
         script:
-          - New-Item -Type Directory -Force bin
-          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X `"main.compileDate=$((get-date).ToLongDateString())`""
+          - New-Item -Type Directory -Force release
+          - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToLongDateString())`""
     - if: ["env.os === 'linux'"]
       overwrite:
         script:
-          - mkdir -p bin
-          - go build -o bin/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X \"main.compileDate=$(date)\""
+          - mkdir -p release
+          - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
   script:
     - echo "Unknown Platform"
     - STOP
@@ -41,6 +42,23 @@ build-windows-amd64:
     GOARCH: amd64
     EXE_SUFFIX: ".exe"
 
+build-windows-arm64:
+  <<: *build-binary
+  variables:
+    GOOS: windows
+    GOARCH: arm64
+    EXE_SUFFIX: ".exe"
+
+# ---
+
+pack-release:
+  script:
+    - mkdir -p release/artifacts
+    - tar cvfJ release/artifacts/impulsar_linux_amd64.tar.xz release/impulsar_linux_amd64
+    - tar cvfJ release/artifacts/impulsar_linux_arm64.tar.xz release/impulsar_linux_arm64
+    - zip -r release/artifacts/impulsar_windows_amd64.zip release/impulsar_windows_amd64.exe
+    - zip -r release/artifacts/impulsar_windows_arm64.zip release/impulsar_windows_arm64.exe
+
 # ---
 
 build-docker:
@@ -56,10 +74,14 @@ install:
 
 install-on-linux:
   if: ["env.os === 'linux'"]
+  variables:
+    IMPULSAR_VERSION: vX.X.X-dev
   script:
-    - go install -ldflags "-X \"main.compileDate=$(date)\""
+    - go install -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
 
 install-on-windows:
   if: ["env.os === 'windows'"]
+  variables:
+    IMPULSAR_VERSION: vX.X.X-dev
   script:
-    - go install -ldflags "-X `"main.compileDate=$((get-date).ToLongDateString())`""
+    - go install -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" -X `"main.compileDate=$((get-date).ToLongDateString())`""

@@ -42,25 +42,13 @@ jobs:
       uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5
       with:
         go-version: '1.21.5'
+    - name: impulsar vorbereiten
+      uses: aimotrens/impulsar@main
     - name: Build
       env:
         IMPULSAR_VERSION: ${{ needs.tag-next-version.outputs.version }}
       run: |
-        mkdir -p release/assets
-        go mod download
-        
-        GOOS=linux GOARCH=amd64 go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o release/impulsar-linux-amd64
-        tar cvfJ release/assets/impulsar-linux-amd64.tar.xz release/impulsar-linux-amd64
-
-        GOOS=linux GOARCH=arm64 go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o release/impulsar-linux-arm64
-        tar cvfJ release/assets/impulsar-linux-arm64.tar.xz release/impulsar-linux-arm64
-
-        GOOS=windows GOARCH=amd64 go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o release/impulsar-windows-amd64.exe
-        zip release/assets/impulsar-windows-amd64.zip release/impulsar-windows-amd64.exe
-
-        GOOS=windows GOARCH=arm64 go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o release/impulsar-windows-arm64.exe
-        zip release/assets/impulsar-windows-arm64.zip release/impulsar-windows-arm64.exe
-
+        impulsar build pack-release
     - name: Github-Release erstellen
       uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1
       with:
