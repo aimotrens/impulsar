@@ -98,6 +98,13 @@
             "$ref": "#/definitions/conditional"
           }
         },
+        "foreach": {
+          "type": "array",
+          "description": "Für jeden Variablensatz wird der Skript-Block ausgeführt.",
+          "items": {
+            "type": "object"
+          }
+        },
         "script": {
           "type": "array",
           "description": "Das Script, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",

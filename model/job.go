@@ -18,6 +18,7 @@ type Job struct {
 	JobsPost    []string          `yaml:"jobs:post"`
 	Script      []string          `yaml:"script"`
 	Variables   map[string]string `yaml:"variables"`
+	Foreach     []Foreach         `yaml:"foreach"`
 }
 
 func (j *Job) SetDefaults() {

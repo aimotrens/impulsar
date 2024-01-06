@@ -34,26 +34,46 @@ func (e *Engine) RunJob(job string) {
 func (e *Engine) executeJob(j *model.Job) {
 	evaluateConditionalField(e, j)
 
-	if evaluateIfCondition(e, j) {
-		for _, pre := range j.JobsPre {
-			e.RunJob(pre)
-		}
-
+	runScriptBlock := func(isForeach bool) {
 		for _, script := range j.Script {
 			if script == "STOP" {
 				fmt.Printf("Job %s failed, due to STOP command\n", j.Name)
 				os.Exit(1)
 			}
 
-			fmt.Printf("[%s] (%s)\n",
+			foreachSuffix := ""
+			if isForeach {
+				foreachSuffix = " via foreach"
+			}
+
+			fmt.Printf("[%s] (%s)%s\n",
 				j.Name,
 				strings.ReplaceAll(
 					strings.Trim(script, "\n"),
 					"\n",
 					"; "),
+				foreachSuffix,
 			)
 
 			e.execCommand(j, script)
+		}
+	}
+
+	if evaluateIfCondition(e, j) {
+		for _, pre := range j.JobsPre {
+			e.RunJob(pre)
+		}
+
+		if j.Foreach != nil {
+			for _, f := range j.Foreach {
+				for k, v := range f {
+					e.variables[k] = v
+				}
+
+				runScriptBlock(true)
+			}
+		} else {
+			runScriptBlock(false)
 		}
 
 		for _, post := range j.JobsPost {

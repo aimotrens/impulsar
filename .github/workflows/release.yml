@@ -52,7 +52,7 @@ jobs:
     - name: Github-Release erstellen
       uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1
       with:
-        artifacts: "release/assets/*"
+        artifacts: "release/artifacts/*"
         tag: ${{ needs.tag-next-version.outputs.version }}
 
         
