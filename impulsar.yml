@@ -1,11 +1,17 @@
 build:
-  jobs:
-    - build-linux-amd64
-    - build-linux-arm64
-    - build-windows-amd64
-    - build-windows-arm64
-
-.build-binary: &build-binary
+  foreach: &platforms
+    - GOOS: linux
+      GOARCH: arm64
+      EXE_SUFFIX: ""
+    - GOOS: linux
+      GOARCH: amd64
+      EXE_SUFFIX: ""
+    - GOOS: windows
+      GOARCH: amd64
+      EXE_SUFFIX: ".exe"
+    - GOOS: windows
+      GOARCH: arm64
+      EXE_SUFFIX: ".exe"
   conditional:
     - if: ["env.os === 'windows'"]
       overwrite:
@@ -21,43 +27,18 @@ build:
     - echo "Unknown Platform"
     - STOP
 
-build-linux-amd64:
-  <<: *build-binary
-  variables:
-    GOOS: linux
-    GOARCH: amd64
-    EXE_SUFFIX: ""
-
-build-linux-arm64:
-  <<: *build-binary
-  variables:
-    GOOS: linux
-    GOARCH: arm64
-    EXE_SUFFIX: ""
-
-build-windows-amd64:
-  <<: *build-binary
-  variables:
-    GOOS: windows
-    GOARCH: amd64
-    EXE_SUFFIX: ".exe"
-
-build-windows-arm64:
-  <<: *build-binary
-  variables:
-    GOOS: windows
-    GOARCH: arm64
-    EXE_SUFFIX: ".exe"
-
 # ---
 
 pack-release:
+  foreach: *platforms
   script:
     - mkdir -p release/artifacts
-    - tar cvfJ release/artifacts/impulsar_linux_amd64.tar.xz release/impulsar_linux_amd64
-    - tar cvfJ release/artifacts/impulsar_linux_arm64.tar.xz release/impulsar_linux_arm64
-    - zip -r release/artifacts/impulsar_windows_amd64.zip release/impulsar_windows_amd64.exe
-    - zip -r release/artifacts/impulsar_windows_arm64.zip release/impulsar_windows_arm64.exe
+    - |
+      if [ "${GOOS}" = "windows" ]; then
+        zip -r release/artifacts/impulsar_${GOOS}_${GOARCH}.zip release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+      else
+        tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+      fi
 
 # ---
 

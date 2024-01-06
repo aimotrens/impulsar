@@ -17,7 +17,7 @@ runs:
 
         cd /tmp
         LATEST=$(curl -I https://github.com/aimotrens/impulsar/releases/latest | awk -F '/' '/^location/ {print  substr($NF, 1, length($NF)-1)}')
-        curl -L https://github.com/aimotrens/impulsar/releases/download/${LATEST}/impulsar-linux-${ARCH}.tar.xz | tar xvfJ -
+        curl -L https://github.com/aimotrens/impulsar/releases/download/${LATEST}/impulsar_linux_${ARCH}.tar.xz | tar xvfJ -
 
-        chmod +x release/impulsar-linux-${ARCH}
-        mv release/impulsar-linux-${ARCH} /usr/local/bin/impulsar
+        chmod +x release/impulsar_linux_${ARCH}
+        mv release/impulsar_linux_${ARCH} /usr/local/bin/impulsar
