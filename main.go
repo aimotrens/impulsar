@@ -17,9 +17,13 @@ import (
 
 var (
 	//go:embed shell-completion/bash.sh
-	bashAutoComplete string
-	compileDate      string
-	impulsarVersion  string
+	bashCompletion string
+
+	//go:embed shell-completion/zsh.sh
+	zshCompletion string
+
+	compileDate     string
+	impulsarVersion string
 )
 
 type arrayFlags []string
@@ -39,6 +43,7 @@ func main() {
 	var dumpJobs bool
 	var showJobs bool
 	var genBashCompletion bool
+	var genZshCompletion bool
 	var version bool
 
 	flag.BoolVar(&version, "v", false, "version")
@@ -48,7 +53,9 @@ func main() {
 	flag.Var(&envVars, "e", "environment variables")
 	flag.BoolVar(&dumpJobs, "dump-jobs", false, "verbose")
 	flag.BoolVar(&showJobs, "show-jobs", false, "verbose")
-	flag.BoolVar(&genBashCompletion, "gen-bash-completion", false, "verbose")
+
+	flag.BoolVar(&genBashCompletion, "gen-bash-completion", false, "generate bash completion")
+	flag.BoolVar(&genZshCompletion, "gen-zsh-completion", false, "generate zsh completion")
 
 	flag.Parse()
 
@@ -58,11 +65,14 @@ func main() {
 	}
 
 	if genBashCompletion {
-		fmt.Println(bashAutoComplete)
+		fmt.Println(bashCompletion)
 		os.Exit(0)
 	}
 
-	fmt.Printf("Impulsar %s", impulsarVersion)
+	if genZshCompletion {
+		fmt.Println(zshCompletion)
+		os.Exit(0)
+	}
 
 	if showJobs {
 		impulsar := loadimpulsarFile(impulsarFile)
@@ -71,6 +81,8 @@ func main() {
 		}
 		os.Exit(0)
 	}
+
+	fmt.Printf("Impulsar %s/n", impulsarVersion)
 
 	if flag.NArg() == 0 {
 		fmt.Println("No jobs provided")
