@@ -22,6 +22,9 @@ var (
 	//go:embed shell-completion/zsh.sh
 	zshCompletion string
 
+	//go:embed shell-completion/powershell.ps1
+	powershellCompletion string
+
 	compileDate     string
 	impulsarVersion string
 )
@@ -44,6 +47,7 @@ func main() {
 	var showJobs bool
 	var genBashCompletion bool
 	var genZshCompletion bool
+	var genPowershellCompletion bool
 	var version bool
 
 	flag.BoolVar(&version, "v", false, "version")
@@ -56,6 +60,7 @@ func main() {
 
 	flag.BoolVar(&genBashCompletion, "gen-bash-completion", false, "generate bash completion")
 	flag.BoolVar(&genZshCompletion, "gen-zsh-completion", false, "generate zsh completion")
+	flag.BoolVar(&genPowershellCompletion, "gen-powershell-completion", false, "generate powershell completion")
 
 	flag.Parse()
 
@@ -71,6 +76,11 @@ func main() {
 
 	if genZshCompletion {
 		fmt.Println(zshCompletion)
+		os.Exit(0)
+	}
+
+	if genPowershellCompletion {
+		fmt.Println(powershellCompletion)
 		os.Exit(0)
 	}
 
