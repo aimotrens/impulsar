@@ -34,6 +34,8 @@ func (e *Engine) CollectArgs(job string) {
 		for _, post := range j.JobsPost {
 			e.CollectArgs(post)
 		}
+
+		return
 	}
 
 	fmt.Printf("Job %s not found\n", job)
@@ -108,6 +110,8 @@ func (e *Engine) execCommand(j *model.Job, script string) {
 		e.execShellCommand(j, script)
 	case model.SHELL_TYPE_DOCKER:
 		e.execDockerCommand(j, script)
+	case model.SHELL_TYPE_SSH:
+		e.execSshCommand(j, script)
 	}
 }
 
@@ -118,6 +122,10 @@ func variableMapper(e *Engine, j *model.Job) func(string) string {
 		}
 
 		if v, ok := j.Variables[s]; ok {
+			return v
+		}
+
+		if v, ok := os.LookupEnv(s); ok {
 			return v
 		}
 

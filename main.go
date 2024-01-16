@@ -92,7 +92,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Printf("Impulsar %s/n", impulsarVersion)
+	fmt.Printf("Impulsar %s\n", impulsarVersion)
 
 	if flag.NArg() == 0 {
 		fmt.Println("No jobs provided")
