@@ -131,6 +131,12 @@ func main() {
 	}
 	fmt.Println("")
 
+	// Alle Job-Argument sammeln
+	for i := 0; i < flag.NArg(); i++ {
+		e.CollectArgs(flag.Arg(i))
+	}
+
+	// Alle Jobs ausführen
 	for i := 0; i < flag.NArg(); i++ {
 		e.RunJob(flag.Arg(i))
 	}

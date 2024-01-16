@@ -107,7 +107,7 @@
         },
         "script": {
           "type": "array",
-          "description": "Das Script, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",
+          "description": "Das Skript, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",
           "items": {
             "type": "string"
           }
@@ -115,6 +115,13 @@
         "variables": {
           "type": "object",
           "description": "Variablen, die in der Shell gesetzt werden sollen.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "arguments": {
+          "type": "object",
+          "description": "Argumente, die an das Skript übergeben werden müssen.",
           "additionalProperties": {
             "type": "string"
           }

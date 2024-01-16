@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"runtime"
@@ -22,16 +23,33 @@ func New(d model.ImpulsarList, variables map[string]string) *Engine {
 	}
 }
 
-func (e *Engine) RunJob(job string) {
-	if scheduledJob, ok := e.impulsar[job]; !ok {
-		fmt.Printf("Job %s not found\n", job)
-		return
-	} else {
-		e.executeJob(scheduledJob)
+func (e *Engine) CollectArgs(job string) {
+	if j, ok := e.impulsar[job]; ok {
+		readArgs(e, j)
+
+		for _, pre := range j.JobsPre {
+			e.CollectArgs(pre)
+		}
+
+		for _, post := range j.JobsPost {
+			e.CollectArgs(post)
+		}
 	}
+
+	fmt.Printf("Job %s not found\n", job)
+}
+
+func (e *Engine) RunJob(job string) {
+	if scheduledJob, ok := e.impulsar[job]; ok {
+		e.executeJob(scheduledJob)
+		return
+	}
+
+	fmt.Printf("Job %s not found\n", job)
 }
 
 func (e *Engine) executeJob(j *model.Job) {
+	readArgs(e, j)
 	evaluateConditionalField(e, j)
 
 	runScriptBlock := func(isForeach bool) {
@@ -173,4 +191,26 @@ func collectEnvVars(e *Engine, j *model.Job) map[string]string {
 	}
 
 	return envVars
+}
+
+func readArgs(e *Engine, j *model.Job) {
+	for arg, description := range j.Arguments {
+		if _, ok := j.Variables[arg]; ok {
+			continue
+		}
+
+		if _, ok := e.variables[arg]; ok {
+			continue
+		}
+
+		fmt.Printf("[%s] %s (%s): ", j.Name, arg, description)
+
+		var value string
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			value = scanner.Text()
+		}
+
+		j.Variables[arg] = value
+	}
 }
