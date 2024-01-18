@@ -107,7 +107,7 @@
         },
         "script": {
           "type": "array",
-          "description": "Das Script, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",
+          "description": "Das Skript, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",
           "items": {
             "type": "string"
           }
@@ -115,6 +115,13 @@
         "variables": {
           "type": "object",
           "description": "Variablen, die in der Shell gesetzt werden sollen.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "arguments": {
+          "type": "object",
+          "description": "Argumente, die an das Skript übergeben werden müssen.",
           "additionalProperties": {
             "type": "string"
           }
@@ -147,20 +154,70 @@
           },
           "required": [
             "image"
-          ]
+          ],
+          "not": {
+            "required": [
+              "server"
+            ]
+          }
         },
         {
           "properties": {
             "type": {
-              "not": {
-                "const": "docker"
-              }
+              "const": "ssh"
+            },
+            "server": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Der Server, auf dem der Befehl ausgeführt werden soll.",
+              "pattern": "^[\\w\\-\\.]+@[\\w\\-\\.]+(:\\d{1,5})?$"
+            }
+          },
+          "required": [
+            "server"
+          ],
+          "not": {
+            "required": [
+              "image"
+            ]
+          }
+        },
+        {
+          "properties": {
+            "type": {
+              "anyOf": [
+                {
+                  "const": "bash"
+                },
+                {
+                  "const": "powershell"
+                },
+                {
+                  "const": "pwsh"
+                },
+                {
+                  "const": "custom"
+                }
+              ]
             }
           },
           "not": {
-            "required": [
-              "image",
-              "uidGid"
+            "anyOf": [
+              {
+                "required": [
+                  "image"
+                ]
+              },
+              {
+                "required": [
+                  "server"
+                ]
+              },
+              {
+                "required": [
+                  "uidGid"
+                ]
+              }
             ]
           }
         }
@@ -174,6 +231,7 @@
             "bash",
             "powershell",
             "pwsh",
+            "ssh",
             "custom"
           ]
         },
@@ -193,6 +251,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "server": {
+          "type": "string",
+          "description": "Der Server, auf dem der Befehl ausgeführt werden soll."
         }
       }
     },

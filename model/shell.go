@@ -7,6 +7,7 @@ const (
 	SHELL_TYPE_PWSH       = "pwsh"
 	SHELL_TYPE_BASH       = "bash"
 	SHELL_TYPE_DOCKER     = "docker"
+	SHELL_TYPE_SSH        = "ssh"
 	SHELL_TYPE_CUSTOM     = "custom"
 )
 
@@ -15,6 +16,7 @@ type Shell struct {
 	Image       string   `yaml:"image"`
 	UidGid      string   `yaml:"uidGid"`
 	BootCommand []string `yaml:"bootCommand"`
+	Server      string   `yaml:"server"`
 }
 
 func (e *Shell) SetDefaults() {

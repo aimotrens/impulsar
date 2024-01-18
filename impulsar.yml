@@ -17,7 +17,7 @@ build:
       overwrite:
         script:
           - New-Item -Type Directory -Force release
-          - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToLongDateString())`""
+          - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
     - if: ["env.os === 'linux'"]
       overwrite:
         script:
@@ -65,4 +65,4 @@ install-on-windows:
   variables:
     IMPULSAR_VERSION: vX.X.X-dev
   script:
-    - go install -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" -X `"main.compileDate=$((get-date).ToLongDateString())`""
+    - go install -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""

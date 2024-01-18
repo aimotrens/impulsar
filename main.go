@@ -92,7 +92,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Printf("Impulsar %s/n", impulsarVersion)
+	fmt.Printf("Impulsar %s\n", impulsarVersion)
 
 	if flag.NArg() == 0 {
 		fmt.Println("No jobs provided")
@@ -131,6 +131,12 @@ func main() {
 	}
 	fmt.Println("")
 
+	// Alle Job-Argument sammeln
+	for i := 0; i < flag.NArg(); i++ {
+		e.CollectArgs(flag.Arg(i))
+	}
+
+	// Alle Jobs ausführen
 	for i := 0; i < flag.NArg(); i++ {
 		e.RunJob(flag.Arg(i))
 	}
