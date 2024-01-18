@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"regexp"
 	"strconv"
@@ -18,8 +17,7 @@ func (e *Engine) execSshCommand(j *model.Job, script string) {
 		return
 	}
 
-	sockFile := os.Getenv("SSH_AUTH_SOCK")
-	agentConn, err := net.Dial("unix", sockFile)
+	agentConn, err := newAgentConnection()
 	if checkError(j, err) {
 		return
 	}

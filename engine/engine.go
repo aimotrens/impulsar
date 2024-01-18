@@ -125,10 +125,6 @@ func variableMapper(e *Engine, j *model.Job) func(string) string {
 			return v
 		}
 
-		if v, ok := os.LookupEnv(s); ok {
-			return v
-		}
-
 		return ""
 	}
 }
