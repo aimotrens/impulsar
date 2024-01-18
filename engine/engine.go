@@ -182,9 +182,6 @@ func evaluateConditionalField(e *Engine, j *model.Job) {
 func collectEnvVars(e *Engine, j *model.Job) map[string]string {
 	var envVars = make(map[string]string)
 
-	envVars["os"] = runtime.GOOS
-	envVars["arch"] = runtime.GOARCH
-
 	for _, v := range os.Environ() {
 		var kv = strings.Split(v, "=")
 		envVars[strings.ToLower(kv[0])] = kv[1]
@@ -197,6 +194,9 @@ func collectEnvVars(e *Engine, j *model.Job) map[string]string {
 	for key, value := range j.Variables {
 		envVars[strings.ToLower(key)] = value
 	}
+
+	envVars["os"] = runtime.GOOS
+	envVars["arch"] = runtime.GOARCH
 
 	return envVars
 }
