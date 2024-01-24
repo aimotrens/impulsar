@@ -78,6 +78,14 @@ func (j *Job) Overwrite(overwrite *Job) error {
 		j.Variables = overwrite.Variables
 	}
 
+	if overwrite.Foreach != nil {
+		j.Foreach = overwrite.Foreach
+	}
+
+	if overwrite.Arguments != nil {
+		j.Arguments = overwrite.Arguments
+	}
+
 	overwrite.SetDefaults()
 
 	return nil
