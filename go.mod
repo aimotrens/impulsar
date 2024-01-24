@@ -1,9 +1,10 @@
 module github.com/aimotrens/impulsar
 
-go 1.21.6
+go 1.21
 
 require (
 	github.com/Microsoft/go-winio v0.6.1
+	github.com/creack/pty v1.1.9
 	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d
 	golang.org/x/crypto v0.18.0
 	gopkg.in/yaml.v3 v3.0.1

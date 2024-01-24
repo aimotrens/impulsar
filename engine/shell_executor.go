@@ -2,12 +2,15 @@ package engine
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/aimotrens/impulsar/model"
+	"github.com/creack/pty"
 )
 
 func (e *Engine) execShellCommand(j *model.Job, script string) {
@@ -42,7 +45,28 @@ func (e *Engine) execShellCommand(j *model.Job, script string) {
 
 	cmd.Dir = j.WorkDir
 
-	err := cmd.Run()
+	//err := cmd.Run()
+
+	p, tty, err := pty.Open()
+
+	cmd.Stdin = tty
+	cmd.Stdout = tty
+	cmd.Stderr = tty
+	cmd.SysProcAttr = &syscall.SysProcAttr{}
+	cmd.SysProcAttr.Setctty = true
+	cmd.SysProcAttr.Setsid = true
+	cmd.SysProcAttr.Ctty = 3
+	cmd.ExtraFiles = []*os.File{tty}
+
+	cmd.Start()
+	if err != nil {
+		p.Close()
+	}
+	tty.Close()
+
+	io.Copy(os.Stdout, p)
+
+	err = cmd.Wait()
 
 	if err != nil {
 		fmt.Printf("Command %s failed:\n%s\n", script, err)
