@@ -28,6 +28,10 @@ func (j *Job) SetDefaults() {
 	}
 	j.Shell.SetDefaults()
 
+	if j.Variables == nil {
+		j.Variables = make(map[string]string)
+	}
+
 	if j.WorkDir == "" {
 		j.WorkDir, _ = os.Getwd()
 	}
