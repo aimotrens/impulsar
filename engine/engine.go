@@ -199,6 +199,10 @@ func collectEnvVars(e *Engine, j *model.Job) map[string]string {
 
 func readArgs(e *Engine, j *model.Job) {
 	for arg, description := range j.Arguments {
+		if _, ok := os.LookupEnv(arg); ok {
+			continue
+		}
+
 		if _, ok := j.Variables[arg]; ok {
 			continue
 		}
