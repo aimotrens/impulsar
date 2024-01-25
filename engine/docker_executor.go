@@ -39,7 +39,7 @@ func (e *Engine) execDockerCommand(j *model.Job, script string) {
 		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
 	}
 
-	scriptExpanded := os.Expand(script, variableMapper(e, j))
+	scriptExpanded := os.Expand(script, e.lookupVar(j))
 
 	args = append(args, "--entrypoint", j.Shell.BootCommand[0], j.Shell.Image)
 	args = append(args, j.Shell.BootCommand[1:]...)

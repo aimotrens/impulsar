@@ -8,18 +8,18 @@ import (
 )
 
 type Job struct {
-	Name        string            `yaml:"-"`
-	Shell       *Shell            `yaml:"shell"`
-	If          []string          `yaml:"if"`
-	Conditional []*Conditional    `yaml:"conditional"`
-	AllowFail   bool              `yaml:"allowFail"`
-	WorkDir     string            `yaml:"workDir"`
-	JobsPre     []string          `yaml:"jobs:pre"`
-	JobsPost    []string          `yaml:"jobs:post"`
-	Script      []string          `yaml:"script"`
-	Variables   map[string]string `yaml:"variables"`
-	Foreach     []Foreach         `yaml:"foreach"`
-	Arguments   map[string]string `yaml:"arguments"`
+	Name        string         `yaml:"-"`
+	Shell       *Shell         `yaml:"shell"`
+	If          []string       `yaml:"if"`
+	Conditional []*Conditional `yaml:"conditional"`
+	AllowFail   bool           `yaml:"allowFail"`
+	WorkDir     string         `yaml:"workDir"`
+	JobsPre     []string       `yaml:"jobs:pre"`
+	JobsPost    []string       `yaml:"jobs:post"`
+	Script      []string       `yaml:"script"`
+	Variables   VariableMap    `yaml:"variables"`
+	Foreach     []VariableMap  `yaml:"foreach"`
+	Arguments   VariableMap    `yaml:"arguments"`
 }
 
 func (j *Job) SetDefaults() {
@@ -29,7 +29,7 @@ func (j *Job) SetDefaults() {
 	j.Shell.SetDefaults()
 
 	if j.Variables == nil {
-		j.Variables = make(map[string]string)
+		j.Variables = make(VariableMap)
 	}
 
 	if j.WorkDir == "" {

@@ -48,7 +48,7 @@ func (e *Engine) execSshCommand(j *model.Job, script string) {
 	session.Stdout = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
 	session.Stderr = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
 
-	scriptExpanded := os.Expand(script, variableMapper(e, j))
+	scriptExpanded := os.Expand(script, e.lookupVar(j))
 
 	err = session.Run(scriptExpanded)
 

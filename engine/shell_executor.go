@@ -11,7 +11,7 @@ import (
 )
 
 func (e *Engine) execShellCommand(j *model.Job, script string) {
-	scriptExpanded := os.Expand(script, variableMapper(e, j))
+	scriptExpanded := os.Expand(script, e.lookupVar(j))
 
 	cmd := exec.Command(j.Shell.BootCommand[0], append(j.Shell.BootCommand[1:], scriptExpanded)...)
 	cmd.Stdout = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}

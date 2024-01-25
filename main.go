@@ -54,7 +54,7 @@ func main() {
 	flag.BoolVar(&version, "version", false, "version")
 
 	flag.StringVar(&impulsarFile, "f", "./impulsar.yml", "impulsar file")
-	flag.Var(&envVars, "e", "environment variables")
+	flag.Var(&envVars, "e", "additional environment variables")
 	flag.BoolVar(&dumpJobs, "dump-jobs", false, "verbose")
 	flag.BoolVar(&showJobs, "show-jobs", false, "verbose")
 
@@ -99,7 +99,7 @@ func main() {
 		return
 	}
 
-	envVarsMap := make(map[string]string)
+	addtitionalEnvVars := make(model.VariableMap)
 	for _, v := range envVars {
 		if !strings.Contains(v, "=") {
 			fmt.Println("Invalid variable:", v)
@@ -107,7 +107,7 @@ func main() {
 
 		kv := strings.Split(v, "=")
 		os.Setenv(kv[0], kv[1])
-		envVarsMap[kv[0]] = kv[1]
+		addtitionalEnvVars[kv[0]] = kv[1]
 	}
 
 	impulsar := loadimpulsarFile(impulsarFile)
@@ -123,7 +123,7 @@ func main() {
 		f.Write(dump)
 	}
 
-	e := engine.New(impulsar, envVarsMap)
+	e := engine.New(impulsar, addtitionalEnvVars)
 
 	fmt.Println("Execution plan ...")
 	for i := 0; i < flag.NArg(); i++ {
@@ -142,7 +142,7 @@ func main() {
 	}
 }
 
-func loadimpulsarFile(impulsarFile string) model.ImpulsarList {
+func loadimpulsarFile(impulsarFile string) map[string]*model.Job {
 	f, err := os.Open(impulsarFile)
 	if err != nil {
 		panic(err)
@@ -150,7 +150,7 @@ func loadimpulsarFile(impulsarFile string) model.ImpulsarList {
 
 	yData, _ := io.ReadAll(f)
 
-	var impulsar model.ImpulsarList
+	var impulsar map[string]*model.Job
 	dec := yaml.NewDecoder(strings.NewReader(string(yData)))
 	dec.KnownFields(true)
 

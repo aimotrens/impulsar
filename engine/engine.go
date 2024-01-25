@@ -12,20 +12,35 @@ import (
 )
 
 type Engine struct {
-	impulsar  model.ImpulsarList
-	variables map[string]string
+	jobList   map[string]*model.Job
+	variables model.VariableMap
 }
 
-func New(d model.ImpulsarList, variables map[string]string) *Engine {
+func New(jobList map[string]*model.Job, additionalEnvVars model.VariableMap) *Engine {
+	envVars := make(model.VariableMap)
+
+	// Aggregate environment and additional variables
+	{
+		for _, v := range os.Environ() {
+			var kv = strings.Split(v, "=")
+			envVars[kv[0]] = kv[1]
+		}
+
+		for key, value := range additionalEnvVars {
+			envVars[key] = value
+		}
+	}
+
 	return &Engine{
-		impulsar:  d,
-		variables: variables,
+		jobList:   jobList,
+		variables: envVars,
 	}
 }
 
+// Collects all arguments for a job recursively
 func (e *Engine) CollectArgs(job string) {
-	if j, ok := e.impulsar[job]; ok {
-		readArgs(e, j)
+	if j, ok := e.jobList[job]; ok {
+		e.readArgsIntoJobVars(j)
 
 		for _, pre := range j.JobsPre {
 			e.CollectArgs(pre)
@@ -42,7 +57,7 @@ func (e *Engine) CollectArgs(job string) {
 }
 
 func (e *Engine) RunJob(job string) {
-	if scheduledJob, ok := e.impulsar[job]; ok {
+	if scheduledJob, ok := e.jobList[job]; ok {
 		e.executeJob(scheduledJob)
 		return
 	}
@@ -51,8 +66,7 @@ func (e *Engine) RunJob(job string) {
 }
 
 func (e *Engine) executeJob(j *model.Job) {
-	readArgs(e, j)
-	evaluateConditionalField(e, j)
+	e.evaluateConditionalField(j)
 
 	runScriptBlock := func(isForeach bool) {
 		for _, script := range j.Script {
@@ -79,7 +93,7 @@ func (e *Engine) executeJob(j *model.Job) {
 		}
 	}
 
-	if evaluateIfCondition(e, j) {
+	if e.evaluateIfCondition(j) {
 		for _, pre := range j.JobsPre {
 			e.RunJob(pre)
 		}
@@ -115,7 +129,7 @@ func (e *Engine) execCommand(j *model.Job, script string) {
 	}
 }
 
-func variableMapper(e *Engine, j *model.Job) func(string) string {
+func (e *Engine) lookupVar(j *model.Job) func(string) string {
 	return func(s string) string {
 		if v, ok := e.variables[s]; ok {
 			return v
@@ -129,12 +143,12 @@ func variableMapper(e *Engine, j *model.Job) func(string) string {
 	}
 }
 
-func evaluateIfCondition(e *Engine, j *model.Job) bool {
+func (e *Engine) evaluateIfCondition(j *model.Job) bool {
 	if j.If == nil {
 		return true
 	}
 
-	var envVars = collectEnvVars(e, j)
+	var envVars = e.aggregateEnvVars(j)
 
 	vm := goja.New()
 	vm.Set("env", envVars)
@@ -150,12 +164,12 @@ func evaluateIfCondition(e *Engine, j *model.Job) bool {
 	return false
 }
 
-func evaluateConditionalField(e *Engine, j *model.Job) {
+func (e *Engine) evaluateConditionalField(j *model.Job) {
 	if j.Conditional == nil {
 		return
 	}
 
-	var envVars = collectEnvVars(e, j)
+	var envVars = e.aggregateEnvVars(j)
 
 	vm := goja.New()
 	vm.Set("env", envVars)
@@ -175,13 +189,8 @@ func evaluateConditionalField(e *Engine, j *model.Job) {
 	}
 }
 
-func collectEnvVars(e *Engine, j *model.Job) map[string]string {
-	var envVars = make(map[string]string)
-
-	for _, v := range os.Environ() {
-		var kv = strings.Split(v, "=")
-		envVars[strings.ToLower(kv[0])] = kv[1]
-	}
+func (e *Engine) aggregateEnvVars(j *model.Job) model.VariableMap {
+	var envVars = make(model.VariableMap)
 
 	for key, value := range e.variables {
 		envVars[strings.ToLower(key)] = value
@@ -197,17 +206,16 @@ func collectEnvVars(e *Engine, j *model.Job) map[string]string {
 	return envVars
 }
 
-func readArgs(e *Engine, j *model.Job) {
+// Processes all arguments for a job
+// If it exists as env var, it will be used
+// If it does not exist, it will be asked
+func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 	for arg, description := range j.Arguments {
 		if _, ok := j.Variables[arg]; ok {
 			continue
 		}
 
-		if _, ok := e.variables[arg]; ok {
-			continue
-		}
-
-		if val, ok := os.LookupEnv(arg); ok {
+		if val, ok := e.variables[arg]; ok {
 			j.Variables[arg] = val
 			continue
 		}
