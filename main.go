@@ -9,6 +9,10 @@ import (
 	"strings"
 
 	"github.com/aimotrens/impulsar/engine"
+	_ "github.com/aimotrens/impulsar/engine/docker_executor"
+	_ "github.com/aimotrens/impulsar/engine/shell_executor"
+	_ "github.com/aimotrens/impulsar/engine/ssh_executor"
+
 	"github.com/aimotrens/impulsar/model"
 	"gopkg.in/yaml.v3"
 
@@ -29,20 +33,9 @@ var (
 	impulsarVersion string
 )
 
-type arrayFlags []string
-
-func (i *arrayFlags) String() string {
-	return strings.Join(*i, ", ")
-}
-
-func (i *arrayFlags) Set(value string) error {
-	*i = append(*i, value)
-	return nil
-}
-
 func main() {
 	var impulsarFile string
-	var envVars arrayFlags
+	var envVars model.FlagArray
 	var dumpJobs bool
 	var showJobs bool
 	var genBashCompletion bool
@@ -55,8 +48,8 @@ func main() {
 
 	flag.StringVar(&impulsarFile, "f", "./impulsar.yml", "impulsar file")
 	flag.Var(&envVars, "e", "additional environment variables")
-	flag.BoolVar(&dumpJobs, "dump-jobs", false, "verbose")
-	flag.BoolVar(&showJobs, "show-jobs", false, "verbose")
+	flag.BoolVar(&dumpJobs, "dump-jobs", false, "dump parsed jobs to impulsar-dump.yml")
+	flag.BoolVar(&showJobs, "show-jobs", false, "show jobs from impulsar.yml")
 
 	flag.BoolVar(&genBashCompletion, "gen-bash-completion", false, "generate bash completion")
 	flag.BoolVar(&genZshCompletion, "gen-zsh-completion", false, "generate zsh completion")

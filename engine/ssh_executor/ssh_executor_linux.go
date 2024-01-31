@@ -1,4 +1,4 @@
-package engine
+package sshexecutor
 
 import (
 	"net"

@@ -1,4 +1,4 @@
-package engine
+package dockerexecutor
 
 import (
 	"fmt"
@@ -8,10 +8,21 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/aimotrens/impulsar/engine"
 	"github.com/aimotrens/impulsar/model"
 )
 
-func (e *Engine) execDockerCommand(j *model.Job, script string) {
+type DockerExecutor struct {
+	*engine.Engine
+}
+
+func init() {
+	engine.RegisterExecutor(model.SHELL_TYPE_DOCKER, func(e *engine.Engine) engine.Shell {
+		return &DockerExecutor{Engine: e}
+	})
+}
+
+func (e *DockerExecutor) Execute(j *model.Job, script string) {
 	wd := j.WorkDir
 	if !filepath.IsAbs(wd) {
 		currentWorkDir, _ := os.Getwd()
@@ -31,7 +42,7 @@ func (e *Engine) execDockerCommand(j *model.Job, script string) {
 		}
 	}
 
-	for key, value := range e.variables {
+	for key, value := range e.Variables {
 		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
 	}
 
@@ -39,15 +50,15 @@ func (e *Engine) execDockerCommand(j *model.Job, script string) {
 		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
 	}
 
-	scriptExpanded := os.Expand(script, e.lookupVar(j))
+	scriptExpanded := os.Expand(script, e.LookupVar(j))
 
 	args = append(args, "--entrypoint", j.Shell.BootCommand[0], j.Shell.Image)
 	args = append(args, j.Shell.BootCommand[1:]...)
 	args = append(args, scriptExpanded)
 
 	cmd := exec.Command("docker", args...)
-	cmd.Stdout = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
-	cmd.Stderr = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
+	cmd.Stdout = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
+	cmd.Stderr = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
 	err := cmd.Run()
 
 	if err != nil {

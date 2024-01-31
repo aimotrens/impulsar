@@ -11,9 +11,20 @@ import (
 	"github.com/dop251/goja"
 )
 
-type Engine struct {
-	jobList   map[string]*model.Job
-	variables model.VariableMap
+type (
+	Engine struct {
+		jobList   map[string]*model.Job
+		shellMap  map[string]Shell
+		Variables model.VariableMap
+	}
+
+	ExecutorConstructor func(*Engine) Shell
+)
+
+var executorMap map[string]ExecutorConstructor = make(map[string]ExecutorConstructor)
+
+func RegisterExecutor(name string, constructor ExecutorConstructor) {
+	executorMap[name] = constructor
 }
 
 func New(jobList map[string]*model.Job, additionalEnvVars model.VariableMap) *Engine {
@@ -31,10 +42,17 @@ func New(jobList map[string]*model.Job, additionalEnvVars model.VariableMap) *En
 		}
 	}
 
-	return &Engine{
+	e := &Engine{
 		jobList:   jobList,
-		variables: envVars,
+		shellMap:  make(map[string]Shell),
+		Variables: envVars,
 	}
+
+	for name, constructor := range executorMap {
+		e.shellMap[name] = constructor(e)
+	}
+
+	return e
 }
 
 // Collects all arguments for a job recursively
@@ -101,7 +119,7 @@ func (e *Engine) executeJob(j *model.Job) {
 		if j.Foreach != nil {
 			for _, f := range j.Foreach {
 				for k, v := range f {
-					e.variables[k] = v
+					e.Variables[k] = v
 				}
 
 				runScriptBlock(true)
@@ -119,19 +137,17 @@ func (e *Engine) executeJob(j *model.Job) {
 }
 
 func (e *Engine) execCommand(j *model.Job, script string) {
-	switch j.Shell.Type {
-	case model.SHELL_TYPE_POWERSHELL, model.SHELL_TYPE_PWSH, model.SHELL_TYPE_BASH, model.SHELL_TYPE_CUSTOM:
-		e.execShellCommand(j, script)
-	case model.SHELL_TYPE_DOCKER:
-		e.execDockerCommand(j, script)
-	case model.SHELL_TYPE_SSH:
-		e.execSshCommand(j, script)
+	if shell, ok := e.shellMap[j.Shell.Type]; !ok {
+		fmt.Printf("Shell type %s not supported\n", j.Shell.Type)
+		os.Exit(1)
+	} else {
+		shell.Execute(j, script)
 	}
 }
 
-func (e *Engine) lookupVar(j *model.Job) func(string) string {
+func (e *Engine) LookupVar(j *model.Job) func(string) string {
 	return func(s string) string {
-		if v, ok := e.variables[s]; ok {
+		if v, ok := e.Variables[s]; ok {
 			return v
 		}
 
@@ -192,7 +208,7 @@ func (e *Engine) evaluateConditionalField(j *model.Job) {
 func (e *Engine) aggregateEnvVars(j *model.Job) model.VariableMap {
 	var envVars = make(model.VariableMap)
 
-	for key, value := range e.variables {
+	for key, value := range e.Variables {
 		envVars[strings.ToLower(key)] = value
 	}
 
@@ -215,7 +231,7 @@ func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 			continue
 		}
 
-		if val, ok := e.variables[arg]; ok {
+		if val, ok := e.Variables[arg]; ok {
 			j.Variables[arg] = val
 			continue
 		}

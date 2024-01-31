@@ -1,4 +1,4 @@
-package engine
+package sshexecutor
 
 import (
 	"fmt"
@@ -6,12 +6,23 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/aimotrens/impulsar/engine"
 	"github.com/aimotrens/impulsar/model"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
 
-func (e *Engine) execSshCommand(j *model.Job, script string) {
+type SshExecutor struct {
+	*engine.Engine
+}
+
+func init() {
+	engine.RegisterExecutor(model.SHELL_TYPE_SSH, func(e *engine.Engine) engine.Shell {
+		return &SshExecutor{Engine: e}
+	})
+}
+
+func (e *SshExecutor) Execute(j *model.Job, script string) {
 	user, server, port, err := splitServerString(j)
 	if checkError(j, err) {
 		return
@@ -45,10 +56,10 @@ func (e *Engine) execSshCommand(j *model.Job, script string) {
 	}
 	defer session.Close()
 
-	session.Stdout = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
-	session.Stderr = &jobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
+	session.Stdout = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
+	session.Stderr = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
 
-	scriptExpanded := os.Expand(script, e.lookupVar(j))
+	scriptExpanded := os.Expand(script, e.LookupVar(j))
 
 	err = session.Run(scriptExpanded)
 

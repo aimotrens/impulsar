@@ -8,13 +8,13 @@ import (
 	"github.com/aimotrens/impulsar/model"
 )
 
-type jobOutputUnifier struct {
+type JobOutputUnifier struct {
 	Job        *model.Job
 	ScriptLine *string
 	Writer     io.Writer
 }
 
-func (s *jobOutputUnifier) Write(p []byte) (n int, err error) {
+func (s *JobOutputUnifier) Write(p []byte) (n int, err error) {
 	n = len(p)
 
 	tmpOutput := string(p)

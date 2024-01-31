@@ -1,8 +1,9 @@
-package engine
+package sshexecutor
 
 import (
-	"github.com/Microsoft/go-winio"
 	"net"
+
+	"github.com/Microsoft/go-winio"
 )
 
 func newAgentConnection() (net.Conn, error) {
