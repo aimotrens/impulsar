@@ -147,11 +147,11 @@ func (e *Engine) execCommand(j *model.Job, script string) {
 
 func (e *Engine) LookupVarFunc(j *model.Job) func(string) string {
 	return func(s string) string {
-		if v, ok := e.Variables[s]; ok {
+		if v, ok := j.Variables[s]; ok {
 			return v
 		}
 
-		if v, ok := j.Variables[s]; ok {
+		if v, ok := e.Variables[s]; ok {
 			return v
 		}
 
