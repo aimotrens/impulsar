@@ -27,12 +27,11 @@ func init() {
 }
 
 func (e *ShellExecutor) Execute(j *model.Job, script string) {
-	scriptExpanded := os.Expand(script, e.LookupVar(j))
+	scriptExpanded := os.Expand(script, e.LookupVarFunc(j))
 
 	cmd := exec.Command(j.Shell.BootCommand[0], append(j.Shell.BootCommand[1:], scriptExpanded)...)
 	cmd.Stdout = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
 	cmd.Stderr = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
-	cmd.Env = os.Environ()
 
 	for key, value := range e.Variables {
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))

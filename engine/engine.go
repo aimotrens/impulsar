@@ -21,7 +21,7 @@ type (
 	ExecutorConstructor func(*Engine) Shell
 )
 
-var executorMap map[string]ExecutorConstructor = make(map[string]ExecutorConstructor)
+var executorMap = make(map[string]ExecutorConstructor)
 
 func RegisterExecutor(name string, constructor ExecutorConstructor) {
 	executorMap[name] = constructor
@@ -145,7 +145,7 @@ func (e *Engine) execCommand(j *model.Job, script string) {
 	}
 }
 
-func (e *Engine) LookupVar(j *model.Job) func(string) string {
+func (e *Engine) LookupVarFunc(j *model.Job) func(string) string {
 	return func(s string) string {
 		if v, ok := e.Variables[s]; ok {
 			return v

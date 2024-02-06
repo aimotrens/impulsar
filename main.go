@@ -124,7 +124,7 @@ func main() {
 	}
 	fmt.Println("")
 
-	// Alle Job-Argument sammeln
+	// Alle Job-Argumente sammeln
 	for i := 0; i < flag.NArg(); i++ {
 		e.CollectArgs(flag.Arg(i))
 	}

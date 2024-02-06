@@ -50,7 +50,7 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) {
 		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
 	}
 
-	scriptExpanded := os.Expand(script, e.LookupVar(j))
+	scriptExpanded := os.Expand(script, e.LookupVarFunc(j))
 
 	args = append(args, "--entrypoint", j.Shell.BootCommand[0], j.Shell.Image)
 	args = append(args, j.Shell.BootCommand[1:]...)
