@@ -1,6 +1,6 @@
 module github.com/aimotrens/impulsar
 
-go 1.21.6
+go 1.21.7
 
 require (
 	github.com/Microsoft/go-winio v0.6.1
