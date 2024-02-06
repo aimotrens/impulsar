@@ -16,7 +16,9 @@ type Job struct {
 	WorkDir     string         `yaml:"workDir"`
 	JobsPre     []string       `yaml:"jobs:pre"`
 	JobsPost    []string       `yaml:"jobs:post"`
+	ScriptPre   []string       `yaml:"script:pre"`
 	Script      []string       `yaml:"script"`
+	ScriptPost  []string       `yaml:"script:post"`
 	Variables   VariableMap    `yaml:"variables"`
 	Foreach     []VariableMap  `yaml:"foreach"`
 	Arguments   VariableMap    `yaml:"arguments"`
@@ -70,8 +72,16 @@ func (j *Job) Overwrite(overwrite *Job) error {
 		j.JobsPost = overwrite.JobsPost
 	}
 
+	if overwrite.ScriptPre != nil {
+		j.ScriptPre = overwrite.ScriptPre
+	}
+
 	if overwrite.Script != nil {
 		j.Script = overwrite.Script
+	}
+
+	if overwrite.ScriptPost != nil {
+		j.ScriptPost = overwrite.ScriptPost
 	}
 
 	if overwrite.Variables != nil {

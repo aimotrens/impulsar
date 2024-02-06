@@ -15,13 +15,15 @@ build:
   conditional:
     - if: ["env.os === 'windows'"]
       overwrite:
-        script:
+        script:pre:
           - New-Item -Type Directory -Force release
+        script:
           - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
     - if: ["env.os === 'linux'"]
       overwrite:
-        script:
+        script:pre:
           - mkdir -p release
+        script:
           - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
   script:
     - echo "Unknown Platform"

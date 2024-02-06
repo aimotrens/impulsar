@@ -105,9 +105,23 @@
             "type": "object"
           }
         },
+        "script:pre": {
+          "type": "array",
+          "description": "Das Skript, das VOR dem eigentlichen Script ausgeführt werden soll. Dieses wird auch bei Vorhandensein von foreach nur einmal ausgeführt.",
+          "items": {
+            "type": "string"
+          }
+        },
         "script": {
           "type": "array",
           "description": "Das Skript, das ausgeführt werden soll. Für jedes Element wird eine neue Shell gestartet.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "script:post": {
+          "type": "array",
+          "description": "Das Skript, das NACH dem eigentlichen Script ausgeführt werden soll. Dieses wird auch bei Vorhandensein von foreach nur einmal ausgeführt.",
           "items": {
             "type": "string"
           }
