@@ -2,8 +2,6 @@ package model
 
 import (
 	"errors"
-	"os"
-
 	"gopkg.in/yaml.v3"
 )
 
@@ -35,7 +33,7 @@ func (j *Job) SetDefaults() {
 	}
 
 	if j.WorkDir == "" {
-		j.WorkDir, _ = os.Getwd()
+		j.WorkDir = "."
 	}
 }
 

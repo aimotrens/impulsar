@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"runtime"
 
 	"github.com/aimotrens/impulsar/engine"
@@ -23,12 +22,6 @@ func init() {
 }
 
 func (e *DockerExecutor) Execute(j *model.Job, script string) {
-	wd := j.WorkDir
-	if !filepath.IsAbs(wd) {
-		currentWorkDir, _ := os.Getwd()
-		wd = path.Join(currentWorkDir, wd)
-	}
-
 	currentWorkDir, _ := os.Getwd()
 	args := []string{"run", "--rm", "-v", currentWorkDir + ":/workdir", "--workdir=" + path.Join("/workdir", j.WorkDir)}
 
