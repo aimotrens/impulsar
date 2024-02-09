@@ -26,7 +26,7 @@ func init() {
 	engine.RegisterExecutor(model.SHELL_TYPE_CUSTOM, constructor)
 }
 
-func (e *ShellExecutor) Execute(j *model.Job, script string) {
+func (e *ShellExecutor) Execute(j *model.Job, script string) error {
 	scriptExpanded := os.Expand(script, e.LookupVarFunc(j))
 
 	cmd := exec.Command(j.Shell.BootCommand[0], append(j.Shell.BootCommand[1:], scriptExpanded)...)
@@ -63,7 +63,9 @@ func (e *ShellExecutor) Execute(j *model.Job, script string) {
 		fmt.Printf("Command %s failed:\n%s\n", script, err)
 
 		if !j.AllowFail {
-			os.Exit(1)
+			return fmt.Errorf("Command %s failed:\n%s\n", script, err)
 		}
 	}
+
+	return nil
 }

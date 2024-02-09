@@ -85,6 +85,13 @@
             "type": "string"
           }
         },
+        "jobs:finalize": {
+          "type": "array",
+          "description": "Jobs, die nach dem Script ausgeführt werden, wenn das Script fehlschlug.",
+          "items": {
+            "type": "string"
+          }
+        },
         "if": {
           "type": "array",
           "description": "Die Bedingungen werden von oben nach unten ausgewertet. Wenn eine Bedingung erfüllt ist, wird der Job ausgeführt.",
@@ -122,6 +129,13 @@
         "script:post": {
           "type": "array",
           "description": "Das Skript, das NACH dem eigentlichen Script ausgeführt werden soll. Dieses wird auch bei Vorhandensein von foreach nur einmal ausgeführt.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "script:finalize": {
+          "type": "array",
+          "description": "Das Skript, das ausgeführt werden soll, wenn das Haupt-Script fehlschlug.",
           "items": {
             "type": "string"
           }

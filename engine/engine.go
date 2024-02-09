@@ -86,7 +86,7 @@ func (e *Engine) RunJob(job string) {
 func (e *Engine) executeJob(j *model.Job) {
 	e.evaluateConditionalField(j)
 
-	runScriptBlock := func(scriptBlock []string, suffix string) {
+	runScriptBlock := func(scriptBlock []string, suffix string) error {
 		for _, script := range scriptBlock {
 			if script == "STOP" {
 				fmt.Printf("Job %s failed, due to STOP command\n", j.Name)
@@ -102,8 +102,20 @@ func (e *Engine) executeJob(j *model.Job) {
 				suffix,
 			)
 
-			e.execCommand(j, script)
+			return e.execCommand(j, script)
 		}
+
+		return nil
+	}
+
+	runFinalizers := func() {
+		_ = runScriptBlock(j.ScriptFinalize, "via script:finalize")
+
+		for _, finalize := range j.JobsFinalize {
+			e.RunJob(finalize)
+		}
+
+		os.Exit(1)
 	}
 
 	if e.evaluateIfCondition(j) {
@@ -112,7 +124,9 @@ func (e *Engine) executeJob(j *model.Job) {
 		}
 
 		if j.ScriptPre != nil {
-			runScriptBlock(j.ScriptPre, "via script:pre")
+			if err := runScriptBlock(j.ScriptPre, "via script:pre"); err != nil {
+				runFinalizers()
+			}
 		}
 
 		if j.Foreach != nil {
@@ -121,14 +135,20 @@ func (e *Engine) executeJob(j *model.Job) {
 					e.Variables[k] = v
 				}
 
-				runScriptBlock(j.Script, "via foreach")
+				if err := runScriptBlock(j.Script, "via foreach"); err != nil {
+					runFinalizers()
+				}
 			}
 		} else {
-			runScriptBlock(j.Script, "")
+			if err := runScriptBlock(j.Script, ""); err != nil {
+				runFinalizers()
+			}
 		}
 
 		if j.ScriptPost != nil {
-			runScriptBlock(j.ScriptPost, "via script:post")
+			if err := runScriptBlock(j.ScriptPost, "via script:post"); err != nil {
+				runFinalizers()
+			}
 		}
 
 		for _, post := range j.JobsPost {
@@ -139,12 +159,13 @@ func (e *Engine) executeJob(j *model.Job) {
 	}
 }
 
-func (e *Engine) execCommand(j *model.Job, script string) {
+func (e *Engine) execCommand(j *model.Job, script string) error {
 	if shell, ok := e.shellMap[j.Shell.Type]; !ok {
 		fmt.Printf("Shell type %s not supported\n", j.Shell.Type)
 		os.Exit(1)
+		return nil
 	} else {
-		shell.Execute(j, script)
+		return shell.Execute(j, script)
 	}
 }
 

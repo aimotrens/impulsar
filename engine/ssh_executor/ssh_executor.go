@@ -22,15 +22,15 @@ func init() {
 	})
 }
 
-func (e *SshExecutor) Execute(j *model.Job, script string) {
+func (e *SshExecutor) Execute(j *model.Job, script string) error {
 	user, server, port, err := splitServerString(j)
-	if checkError(j, err) {
-		return
+	if checkError(j, err) != nil {
+		return err
 	}
 
 	agentConn, err := newAgentConnection()
-	if checkError(j, err) {
-		return
+	if checkError(j, err) != nil {
+		return err
 	}
 
 	agentClient := agent.NewClient(agentConn)
@@ -45,14 +45,14 @@ func (e *SshExecutor) Execute(j *model.Job, script string) {
 	sshConfig.HostKeyCallback = ssh.InsecureIgnoreHostKey()
 
 	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", server, port), sshConfig)
-	if checkError(j, err) {
-		return
+	if checkError(j, err) != nil {
+		return err
 	}
 	defer client.Close()
 
 	session, err := client.NewSession()
-	if checkError(j, err) {
-		return
+	if checkError(j, err) != nil {
+		return err
 	}
 	defer session.Close()
 
@@ -65,23 +65,27 @@ func (e *SshExecutor) Execute(j *model.Job, script string) {
 
 	switch err.(type) {
 	case *ssh.ExitMissingError:
-		return
+		return nil
 	default:
-		checkError(j, err)
+		if checkError(j, err) != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
-func checkError(j *model.Job, err error) bool {
+func checkError(j *model.Job, err error) error {
 	if err != nil {
 		if j.AllowFail {
-			return true
+			return nil
 		}
 
 		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 
-	return false
+	return nil
 }
 
 func splitServerString(j *model.Job) (user string, server string, port uint16, err error) {

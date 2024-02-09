@@ -21,7 +21,7 @@ func init() {
 	})
 }
 
-func (e *DockerExecutor) Execute(j *model.Job, script string) {
+func (e *DockerExecutor) Execute(j *model.Job, script string) error {
 	currentWorkDir, _ := os.Getwd()
 	args := []string{"run", "--rm", "-v", currentWorkDir + ":/workdir", "--workdir=" + path.Join("/workdir", j.WorkDir)}
 
@@ -58,7 +58,9 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) {
 		fmt.Printf("Command %s failed\n%s\n", script, err)
 
 		if !j.AllowFail {
-			os.Exit(1)
+			fmt.Errorf("Command %s failed\n%s\n", script, err)
 		}
 	}
+
+	return nil
 }
