@@ -102,7 +102,9 @@ func (e *Engine) executeJob(j *model.Job) {
 				suffix,
 			)
 
-			return e.execCommand(j, script)
+			if err := e.execCommand(j, script); err != nil {
+				return err
+			}
 		}
 
 		return nil
