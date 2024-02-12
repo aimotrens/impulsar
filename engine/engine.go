@@ -110,7 +110,7 @@ func (e *Engine) executeJob(j *model.Job) {
 		return nil
 	}
 
-	runFinalizers := func() {
+	exitWithFinalizer := func() {
 		_ = runScriptBlock(j.ScriptFinalize, "via script:finalize")
 
 		for _, finalize := range j.JobsFinalize {
@@ -127,7 +127,7 @@ func (e *Engine) executeJob(j *model.Job) {
 
 		if j.ScriptPre != nil {
 			if err := runScriptBlock(j.ScriptPre, "via script:pre"); err != nil {
-				runFinalizers()
+				exitWithFinalizer()
 			}
 		}
 
@@ -138,23 +138,31 @@ func (e *Engine) executeJob(j *model.Job) {
 				}
 
 				if err := runScriptBlock(j.Script, "via foreach"); err != nil {
-					runFinalizers()
+					exitWithFinalizer()
 				}
 			}
 		} else {
 			if err := runScriptBlock(j.Script, ""); err != nil {
-				runFinalizers()
+				exitWithFinalizer()
 			}
 		}
 
 		if j.ScriptPost != nil {
 			if err := runScriptBlock(j.ScriptPost, "via script:post"); err != nil {
-				runFinalizers()
+				exitWithFinalizer()
 			}
+		}
+
+		if j.ScriptFinalize != nil {
+			_ = runScriptBlock(j.ScriptFinalize, "view script:finalize")
 		}
 
 		for _, post := range j.JobsPost {
 			e.RunJob(post)
+		}
+
+		for _, fin := range j.JobsFinalize {
+			e.RunJob(fin)
 		}
 	} else {
 		fmt.Printf("Job %s skipped, no condition matched\n", j.Name)
