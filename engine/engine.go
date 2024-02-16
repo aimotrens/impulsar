@@ -260,17 +260,17 @@ func (e *Engine) aggregateEnvVars(j *model.Job) model.VariableMap {
 // If it exists as env var, it will be used
 // If it does not exist, it will be asked
 func (e *Engine) readArgsIntoJobVars(j *model.Job) {
-	for arg, description := range j.Arguments {
-		if _, ok := j.Variables[arg]; ok {
+	for name, argDef := range j.Arguments {
+		if _, ok := j.Variables[name]; ok {
 			continue
 		}
 
-		if val, ok := e.Variables[arg]; ok {
-			j.Variables[arg] = val
+		if val, ok := e.Variables[name]; ok {
+			j.Variables[name] = val
 			continue
 		}
 
-		fmt.Printf("[%s] %s (%s): ", j.Name, arg, description)
+		fmt.Printf("[%s] %s (%s) [%s]: ", j.Name, name, argDef.Description, argDef.Default)
 
 		var value string
 		scanner := bufio.NewScanner(os.Stdin)
@@ -278,6 +278,10 @@ func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 			value = scanner.Text()
 		}
 
-		j.Variables[arg] = value
+		if value == "" {
+			value = argDef.Default
+		}
+
+		j.Variables[name] = value
 	}
 }

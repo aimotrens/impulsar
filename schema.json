@@ -151,7 +151,19 @@
           "type": "object",
           "description": "Argumente, die an das Skript übergeben werden müssen.",
           "additionalProperties": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Die Beschreibung des Arguments."
+              },
+              {
+                "type": "object",
+                "description": "Definition eines Arguments",
+                "items": {
+                  "$ref": "#/definitions/argumentDefinition"
+                }
+              }
+            ]
           }
         },
         "workDir": {
@@ -159,6 +171,21 @@
           "description": "Das Arbeitsverzeichnis, in dem das Script ausgeführt werden soll."
         }
       }
+    },
+    "argumentDefinition": {
+      "type": "object",
+      "description": "Definition eines Arguments",
+      "additionalProperties": false,
+      "properties": {
+          "description": {
+            "type": "string",
+            "description": "Die Beschreibung des Arguments."
+          },
+          "default": {
+            "type": "string",
+            "description": "Der Standardwert des Arguments."
+          }
+        }
     },
     "shell": {
       "type": "object",

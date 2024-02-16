@@ -21,7 +21,7 @@ type Job struct {
 	ScriptFinalize []string       `yaml:"script:finalize"`
 	Variables      VariableMap    `yaml:"variables"`
 	Foreach        []VariableMap  `yaml:"foreach"`
-	Arguments      VariableMap    `yaml:"arguments"`
+	Arguments      ArgumentMap    `yaml:"arguments"`
 }
 
 func (j *Job) SetDefaults() {
