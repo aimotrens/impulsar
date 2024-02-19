@@ -36,6 +36,7 @@ func (a *ArgumentMap) UnmarshalYAML(v *yaml.Node) error {
 func (d *decoderMultiType) UnmarshalYAML(v *yaml.Node) error {
 	err := v.Decode(&d.string)
 	if err == nil {
+		d.Description = d.string
 		return nil
 	}
 
