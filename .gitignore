@@ -23,3 +23,4 @@ go.work
 release/
 impulsar-dev.yml
 .idea/
+site/

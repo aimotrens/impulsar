@@ -68,3 +68,20 @@ install-on-windows:
     IMPULSAR_VERSION: vX.X.X-dev
   script:
     - go install -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
+
+# ---
+
+start-docs:
+  workDir: docs-site
+  script:
+    - |
+      docker run -d --name mkdocs-dev --rm -p 80:8000 -v "$(pwd):/src" debian:bookworm /bin/bash -c "
+      apt-get update && apt-get install -y python3 pip
+      pip install --break-system-packages mkdocs mkdocs[i18n] mkdocs-material mkdocs-markdownextradata-plugin
+      cd /src
+      mkdocs serve -a 0.0.0.0:8000"
+
+stop-docs:
+  script:
+    - |
+      docker stop mkdocs-dev
