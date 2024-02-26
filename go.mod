@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/Microsoft/go-winio v0.6.1
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
-	golang.org/x/crypto v0.19.0
+	golang.org/x/crypto v0.20.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
