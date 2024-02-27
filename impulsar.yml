@@ -15,16 +15,14 @@ build:
   conditional:
     - if: ["env.os === 'windows'"]
       overwrite:
-        script:pre:
-          - New-Item -Type Directory -Force release
         script:
-          - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
+          - New-Item -Type Directory -Force release/${GOOS}_${GOARCH}
+          - go build -o release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
     - if: ["env.os === 'linux'"]
       overwrite:
-        script:pre:
-          - mkdir -p release
         script:
-          - go build -o release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX} -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
+          - mkdir -p release/${GOOS}_${GOARCH}
+          - go build -o release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX} -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
   script:
     - echo "Unknown Platform"
     - STOP
@@ -32,14 +30,16 @@ build:
 # ---
 
 pack-release:
+  shell:
+    type: bash
   foreach: *platforms
   script:
     - mkdir -p release/artifacts
     - |
       if [ "${GOOS}" = "windows" ]; then
-        zip -r release/artifacts/impulsar_${GOOS}_${GOARCH}.zip release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+        zip -r -j release/artifacts/impulsar_${GOOS}_${GOARCH}.zip release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX}
       else
-        tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz release/impulsar_${GOOS}_${GOARCH}${EXE_SUFFIX}
+        tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz -C release/${GOOS}_${GOARCH} impulsar${EXE_SUFFIX}
       fi
 
 # ---

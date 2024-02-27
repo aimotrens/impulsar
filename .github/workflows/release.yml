@@ -42,13 +42,11 @@ jobs:
       uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5
       with:
         go-version: '1.22'
-    - name: impulsar vorbereiten
-      uses: aimotrens/impulsar@main
     - name: Build
       env:
         IMPULSAR_VERSION: ${{ needs.tag-next-version.outputs.version }}
       run: |
-        impulsar build pack-release
+        go run . build pack-release
     - name: Github-Release erstellen
       uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1
       with:
