@@ -35,13 +35,15 @@ pack-release:
   shell:
     type: bash
   foreach: *platforms
-  script:
+  script:pre:
     - mkdir -p release/artifacts
+  script:
     - |
+      cp ./LICENSE release/${GOOS}_${GOARCH}/
       if [ "${GOOS}" = "windows" ]; then
-        zip -r -j release/artifacts/impulsar_${GOOS}_${GOARCH}.zip release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX}
+        zip -r -j release/artifacts/impulsar_${GOOS}_${GOARCH}.zip release/${GOOS}_${GOARCH}/
       else
-        tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz -C release/${GOOS}_${GOARCH} impulsar${EXE_SUFFIX}
+        tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz -C release/${GOOS}_${GOARCH} impulsar LICENSE
       fi
 
 # ---
