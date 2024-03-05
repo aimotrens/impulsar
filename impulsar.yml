@@ -13,12 +13,14 @@ build:
       GOARCH: arm64
       EXE_SUFFIX: ".exe"
   conditional:
-    - if: ["env.os === 'windows'"]
+    - if:
+        - OS: windows
       overwrite:
         script:
           - New-Item -Type Directory -Force release/${GOOS}_${GOARCH}
           - go build -o release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
-    - if: ["env.os === 'linux'"]
+    - if:
+        - OS: linux
       overwrite:
         script:
           - mkdir -p release/${GOOS}_${GOARCH}
@@ -56,14 +58,16 @@ install:
     - install-on-windows
 
 install-on-linux:
-  if: ["env.os === 'linux'"]
+  if:
+    - OS: linux
   variables:
     IMPULSAR_VERSION: vX.X.X-dev
   script:
     - go install -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
 
 install-on-windows:
-  if: ["env.os === 'windows'"]
+  if:
+    - OS: windows
   variables:
     IMPULSAR_VERSION: vX.X.X-dev
   script:

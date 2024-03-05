@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/aimotrens/impulsar/model"
-	"github.com/dop251/goja"
 )
 
 type (
@@ -198,15 +197,16 @@ func (e *Engine) evaluateIfCondition(j *model.Job) bool {
 		return true
 	}
 
-	var envVars = e.aggregateEnvVars(j)
+	envVars := e.aggregateEnvVars(j)
 
-	vm := goja.New()
-	vm.Set("env", envVars)
+	for _, varSet := range j.If {
+		var success = true
 
-	for _, v := range j.If {
-		res, _ := vm.RunString(v)
+		for k, v := range varSet {
+			success = success && (envVars[strings.ToLower(k)] == v)
+		}
 
-		if res.ToBoolean() {
+		if success {
 			return true
 		}
 	}
@@ -221,14 +221,15 @@ func (e *Engine) evaluateConditionalField(j *model.Job) {
 
 	var envVars = e.aggregateEnvVars(j)
 
-	vm := goja.New()
-	vm.Set("env", envVars)
-
 	for _, v := range j.Conditional {
-		for _, ifCondition := range v.If {
-			res, _ := vm.RunString(ifCondition)
+		for _, varSet := range v.If {
+			var success = true
 
-			if res.ToBoolean() {
+			for k, v := range varSet {
+				success = success && (envVars[strings.ToLower(k)] == v)
+			}
+
+			if success {
 				if v.Overwrite != nil {
 					j.Overwrite(v.Overwrite)
 				}

@@ -96,7 +96,7 @@
           "type": "array",
           "description": "Die Bedingungen werden von oben nach unten ausgewertet. Wenn eine Bedingung erfüllt ist, wird der Job ausgeführt.",
           "items": {
-            "type": "string"
+            "type": "object"
           }
         },
         "conditional": {
@@ -320,7 +320,7 @@
           "type": "array",
           "description": "Die Bedingungen werden von oben nach unten ausgewertet. Wenn eine Bedingung erfüllt ist, wird der Job entsprechend \"overwrite\" angepasst.",
           "items": {
-            "type": "string"
+            "type": "object"
           }
         },
         "overwrite": {

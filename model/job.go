@@ -8,7 +8,7 @@ import (
 type Job struct {
 	Name           string         `yaml:"-"`
 	Shell          *Shell         `yaml:"shell"`
-	If             []string       `yaml:"if"`
+	If             []VariableMap  `yaml:"if"`
 	Conditional    []*Conditional `yaml:"conditional"`
 	AllowFail      bool           `yaml:"allowFail"`
 	WorkDir        string         `yaml:"workDir"`
