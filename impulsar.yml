@@ -40,10 +40,11 @@ pack-release:
   script:
     - |
       cp ./LICENSE release/${GOOS}_${GOARCH}/
+      cp README.md release/${GOOS}_${GOARCH}/
       if [ "${GOOS}" = "windows" ]; then
         zip -r -j release/artifacts/impulsar_${GOOS}_${GOARCH}.zip release/${GOOS}_${GOARCH}/
       else
-        tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz -C release/${GOOS}_${GOARCH} impulsar LICENSE
+        tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz -C release/${GOOS}_${GOARCH} impulsar LICENSE README.md
       fi
 
 # ---
