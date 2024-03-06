@@ -27,7 +27,8 @@ func init() {
 }
 
 func (e *ShellExecutor) Execute(j *model.Job, script string) error {
-	scriptExpanded := os.Expand(script, e.LookupVarFunc(j))
+	scriptExpanded := e.ExpandVarsWithTemplateEngine(script, j)
+	scriptExpanded = os.Expand(scriptExpanded, e.LookupVarFunc(j))
 
 	cmd := exec.Command(j.Shell.BootCommand[0], append(j.Shell.BootCommand[1:], scriptExpanded)...)
 	cmd.Stdout = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}

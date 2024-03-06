@@ -43,7 +43,8 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) error {
 		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
 	}
 
-	scriptExpanded := os.Expand(script, e.LookupVarFunc(j))
+	scriptExpanded := e.ExpandVarsWithTemplateEngine(script, j)
+	scriptExpanded = os.Expand(scriptExpanded, e.LookupVarFunc(j))
 
 	args = append(args, "--entrypoint", j.Shell.BootCommand[0], j.Shell.Image)
 	args = append(args, j.Shell.BootCommand[1:]...)
@@ -58,7 +59,7 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) error {
 		fmt.Printf("Command %s failed\n%s\n", script, err)
 
 		if !j.AllowFail {
-			fmt.Errorf("Command %s failed\n%s\n", script, err)
+			return fmt.Errorf("command %s failed\n%s", script, err)
 		}
 	}
 
