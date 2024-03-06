@@ -92,12 +92,18 @@ func (e *Engine) executeJob(j *model.Job) {
 				os.Exit(1)
 			}
 
+			scriptPrint := strings.ReplaceAll(
+				strings.Trim(script, "\n"),
+				"\n",
+				"; ")
+
+			if len(scriptPrint) > 81 {
+				scriptPrint = scriptPrint[0:50] + " . . . . . " + scriptPrint[len(scriptPrint)-20:]
+			}
+
 			fmt.Printf("[%s] (%s) %s\n",
 				j.Name,
-				strings.ReplaceAll(
-					strings.Trim(script, "\n"),
-					"\n",
-					"; "),
+				scriptPrint,
 				suffix,
 			)
 
