@@ -209,7 +209,7 @@ func (e *Engine) evaluateIfCondition(j *model.Job) bool {
 		var success = true
 
 		for k, v := range varSet {
-			success = success && (envVars[strings.ToLower(k)] == v)
+			success = success && (envVars[k] == v)
 		}
 
 		if success {
@@ -232,7 +232,7 @@ func (e *Engine) evaluateConditionalField(j *model.Job) {
 			var success = true
 
 			for k, v := range varSet {
-				success = success && (envVars[strings.ToLower(k)] == v)
+				success = success && (envVars[k] == v)
 			}
 
 			if success {
@@ -250,15 +250,15 @@ func (e *Engine) aggregateEnvVars(j *model.Job) model.VariableMap {
 	var envVars = make(model.VariableMap)
 
 	for key, value := range e.Variables {
-		envVars[strings.ToLower(key)] = value
+		envVars[key] = value
 	}
 
 	for key, value := range j.Variables {
-		envVars[strings.ToLower(key)] = value
+		envVars[key] = value
 	}
 
-	envVars["os"] = runtime.GOOS
-	envVars["arch"] = runtime.GOARCH
+	envVars["OS"] = runtime.GOOS
+	envVars["ARCH"] = runtime.GOARCH
 
 	return envVars
 }
