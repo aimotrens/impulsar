@@ -1,3 +1,7 @@
+test:
+  script:
+    - go test -v ./...
+
 build:
   foreach: &platforms
     - GOOS: linux
@@ -12,22 +16,18 @@ build:
     - GOOS: windows
       GOARCH: arm64
       EXE_SUFFIX: ".exe"
-  conditional:
-    - if:
-        - OS: windows
-      overwrite:
-        script:
-          - New-Item -Type Directory -Force release/${GOOS}_${GOARCH}
-          - go build -o release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
-    - if:
-        - OS: linux
-      overwrite:
-        script:
-          - mkdir -p release/${GOOS}_${GOARCH}
-          - go build -o release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX} -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
   script:
-    - echo "Unknown Platform"
-    - STOP
+    - |
+      {{if eq .OS "windows"}}
+        New-Item -Type Directory -Force release/${GOOS}_${GOARCH}
+        go build -o release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX} -ldflags "-X `"main.impulsarVersion=${IMPULSAR_VERSION}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
+      {{else if eq .OS "linux"}}
+        mkdir -p release/${GOOS}_${GOARCH}
+        go build -o release/${GOOS}_${GOARCH}/impulsar${EXE_SUFFIX} -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\""
+      {{else}}
+        echo "Unknown Platform"
+        STOP
+      {{end}}
 
 # ---
 
@@ -41,11 +41,11 @@ pack-release:
     - |
       cp ./LICENSE release/${GOOS}_${GOARCH}/
       cp README.md release/${GOOS}_${GOARCH}/
-      if [ "${GOOS}" = "windows" ]; then
+      {{if eq .GOOS "windows"}}
         zip -r -j release/artifacts/impulsar_${GOOS}_${GOARCH}.zip release/${GOOS}_${GOARCH}/
-      else
+      {{else}}
         tar cvfJ release/artifacts/impulsar_${GOOS}_${GOARCH}.tar.xz -C release/${GOOS}_${GOARCH} impulsar LICENSE README.md
-      fi
+      {{end}}
 
 # ---
 

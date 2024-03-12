@@ -2,6 +2,8 @@ package model
 
 import (
 	"errors"
+	"fmt"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -101,7 +103,7 @@ func (j *Job) Overwrite(overwrite *Job) error {
 	}
 
 	if overwrite.Arguments != nil {
-		j.Arguments = overwrite.Arguments
+		return fmt.Errorf("cannot overwrite job arguments")
 	}
 
 	overwrite.SetDefaults()

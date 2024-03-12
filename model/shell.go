@@ -39,7 +39,7 @@ func (e *Shell) SetDefaults() {
 			e.BootCommand = []string{"pwsh", "-Command"}
 		case "bash":
 			e.BootCommand = []string{"bash", "-c"}
-			
+
 			if runtime.GOOS == "windows" {
 				e.BootCommand = append([]string{"wsl", "--exec"}, e.BootCommand...)
 			}
