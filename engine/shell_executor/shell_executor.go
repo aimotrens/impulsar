@@ -46,6 +46,10 @@ func (e *ShellExecutor) Execute(j *model.Job, script string) error {
 		var wslEnv []string
 
 		for key := range e.Variables {
+			if key == "PATH" {
+				continue
+			}
+
 			wslEnv = append(wslEnv, key+"/u")
 		}
 
