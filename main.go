@@ -58,7 +58,7 @@ func main() {
 	flag.Parse()
 
 	if version {
-		fmt.Printf("Impulsar %s\nCompiled at %s with %s on %s/%s\n\n", impulsarVersion, compileDate, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+		fmt.Printf("Impulsar %s\nCompiled at %s with %s\n\n", impulsarVersion, compileDate, runtime.Version())
 		os.Exit(0)
 	}
 
