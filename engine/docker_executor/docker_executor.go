@@ -36,6 +36,10 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) error {
 	}
 
 	for key, value := range e.Variables {
+		if key == "PATH" {
+			continue
+		}
+		
 		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
 	}
 
