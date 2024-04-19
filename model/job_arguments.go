@@ -2,14 +2,16 @@ package model
 
 import (
 	"fmt"
+
 	"gopkg.in/yaml.v3"
 )
 
 type ArgumentMap map[string]*ArgumentDefinition
 
 type ArgumentDefinition struct {
-	Description string `yaml:"description"`
-	Default     string `yaml:"default"`
+	Description string   `yaml:"description"`
+	Default     string   `yaml:"default"`
+	Allowed     []string `yaml:"allowed"`
 }
 
 type decoderMultiType struct {
@@ -27,7 +29,22 @@ func (a *ArgumentMap) UnmarshalYAML(v *yaml.Node) error {
 	}
 
 	for key, value := range tmp {
-		(*a)[key] = &value.ArgumentDefinition
+		argDef := &value.ArgumentDefinition
+		(*a)[key] = argDef
+
+		if argDef.Default != "" && len(argDef.Allowed) > 0 {
+			defaultIsAllowedValue := false
+			for _, allowed := range argDef.Allowed {
+				if argDef.Default == allowed {
+					defaultIsAllowedValue = true
+					break
+				}
+			}
+
+			if !defaultIsAllowedValue {
+				return fmt.Errorf("default value is not in allowed values (line %v)", v.Line)
+			}
+		}
 	}
 
 	return nil

@@ -277,7 +277,11 @@ func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 			continue
 		}
 
-		fmt.Printf("[%s] %s (%s) [%s]: ", j.Name, name, argDef.Description, argDef.Default)
+		if argDef.Allowed == nil {
+			fmt.Printf("[%s] %s (%s) [%s]: ", j.Name, name, argDef.Description, argDef.Default)
+		} else {
+			fmt.Printf("[%s] %s (%s) [%s] {%s}: ", j.Name, name, argDef.Description, argDef.Default, strings.Join(argDef.Allowed, ", "))
+		}
 
 		var value string
 		scanner := bufio.NewScanner(os.Stdin)
@@ -287,6 +291,22 @@ func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 
 		if value == "" {
 			value = argDef.Default
+		}
+
+		if argDef.Allowed != nil {
+			isAllowedValue := false
+
+			for _, a := range argDef.Allowed {
+				if a == value {
+					isAllowedValue = true
+					break
+				}
+			}
+
+			if !isAllowedValue {
+				fmt.Printf("Value %s not allowed\n", value)
+				os.Exit(1)
+			}
 		}
 
 		j.Variables[name] = value
