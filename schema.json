@@ -147,6 +147,13 @@
             "type": "string"
           }
         },
+        "variablesExcluded": {
+          "type": "array",
+          "description": "Variablen, die im Job nicht gesetzt werden sollen.",
+          "items": {
+            "type": "string"
+          }
+        },
         "arguments": {
           "type": "object",
           "description": "Argumente, die an das Skript übergeben werden müssen.",

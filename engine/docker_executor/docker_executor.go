@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path"
 	"runtime"
+	"slices"
 
 	"github.com/aimotrens/impulsar/engine"
 	"github.com/aimotrens/impulsar/model"
@@ -39,7 +40,11 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) error {
 		if key == "PATH" {
 			continue
 		}
-		
+
+		if j.VariablesExcluded != nil && slices.Contains(j.VariablesExcluded, key) {
+			continue
+		}
+
 		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
 	}
 

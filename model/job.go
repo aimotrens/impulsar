@@ -8,22 +8,23 @@ import (
 )
 
 type Job struct {
-	Name           string         `yaml:"-"`
-	Shell          *Shell         `yaml:"shell"`
-	If             []VariableMap  `yaml:"if"`
-	Conditional    []*Conditional `yaml:"conditional"`
-	AllowFail      bool           `yaml:"allowFail"`
-	WorkDir        string         `yaml:"workDir"`
-	JobsPre        []string       `yaml:"jobs:pre"`
-	JobsPost       []string       `yaml:"jobs:post"`
-	JobsFinalize   []string       `yaml:"jobs:finalize"`
-	ScriptPre      []string       `yaml:"script:pre"`
-	Script         []string       `yaml:"script"`
-	ScriptPost     []string       `yaml:"script:post"`
-	ScriptFinalize []string       `yaml:"script:finalize"`
-	Variables      VariableMap    `yaml:"variables"`
-	Foreach        []VariableMap  `yaml:"foreach"`
-	Arguments      ArgumentMap    `yaml:"arguments"`
+	Name              string         `yaml:"-"`
+	Shell             *Shell         `yaml:"shell"`
+	If                []VariableMap  `yaml:"if"`
+	Conditional       []*Conditional `yaml:"conditional"`
+	AllowFail         bool           `yaml:"allowFail"`
+	WorkDir           string         `yaml:"workDir"`
+	JobsPre           []string       `yaml:"jobs:pre"`
+	JobsPost          []string       `yaml:"jobs:post"`
+	JobsFinalize      []string       `yaml:"jobs:finalize"`
+	ScriptPre         []string       `yaml:"script:pre"`
+	Script            []string       `yaml:"script"`
+	ScriptPost        []string       `yaml:"script:post"`
+	ScriptFinalize    []string       `yaml:"script:finalize"`
+	Variables         VariableMap    `yaml:"variables"`
+	VariablesExcluded []string       `yaml:"variablesExcluded"`
+	Foreach           []VariableMap  `yaml:"foreach"`
+	Arguments         ArgumentMap    `yaml:"arguments"`
 }
 
 func (j *Job) SetDefaults() {
@@ -96,6 +97,10 @@ func (j *Job) Overwrite(overwrite *Job) error {
 
 	if overwrite.Variables != nil {
 		j.Variables = overwrite.Variables
+	}
+
+	if overwrite.VariablesExcluded != nil {
+		j.VariablesExcluded = overwrite.VariablesExcluded
 	}
 
 	if overwrite.Foreach != nil {

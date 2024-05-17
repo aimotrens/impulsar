@@ -253,6 +253,20 @@ func Test_Job_Overwrite_Variables_OK(t *testing.T) {
 	assert.Equal(t, "value2", j.Variables["key"])
 }
 
+func Test_Job_Overwrite_VariablesExcluded_OK(t *testing.T) {
+	j := &model.Job{
+		VariablesExcluded: []string{"key"},
+	}
+
+	overwrite := &model.Job{
+		VariablesExcluded: []string{"key2"},
+	}
+
+	err := j.Overwrite(overwrite)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"key2"}, j.VariablesExcluded)
+}
+
 func Test_Job_Overwrite_Foreach_OK(t *testing.T) {
 	j := &model.Job{
 		Foreach: []model.VariableMap{

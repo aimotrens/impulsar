@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"slices"
 	"strings"
 
 	"github.com/aimotrens/impulsar/engine"
@@ -47,6 +48,10 @@ func (e *ShellExecutor) Execute(j *model.Job, script string) error {
 
 		for key := range e.Variables {
 			if key == "PATH" {
+				continue
+			}
+
+			if j.VariablesExcluded != nil && slices.Contains(j.VariablesExcluded, key) {
 				continue
 			}
 
