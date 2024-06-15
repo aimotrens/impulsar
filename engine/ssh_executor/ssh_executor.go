@@ -103,7 +103,11 @@ func splitServerString(j *model.Job) (user string, server string, port uint16, e
 	port = 22
 
 	if matches[re.SubexpIndex("port")] != "" {
-		intPort, _ := strconv.Atoi(matches[re.SubexpIndex("port")])
+		intPort, e := strconv.ParseInt(matches[re.SubexpIndex("port")], 10, 16)
+		if e != nil {
+			err = fmt.Errorf("[%s] invalid port: %s", j.Name, matches[re.SubexpIndex("port")])
+			return
+		}
 		port = uint16(intPort)
 	}
 
