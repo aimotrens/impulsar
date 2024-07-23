@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/aimotrens/impulsar/cout"
 	"io"
 	"os"
 	"runtime"
@@ -85,17 +86,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Printf("Impulsar %s\n", impulsarVersion)
+	fmt.Printf(cout.Bold(fmt.Sprintf("Impulsar %s\n", impulsarVersion)))
 
 	if flag.NArg() == 0 {
-		fmt.Println("No jobs provided")
+		fmt.Println(cout.Yellow("No jobs provided"))
 		return
 	}
 
 	addtitionalEnvVars := make(model.VariableMap)
 	for _, v := range envVars {
 		if !strings.Contains(v, "=") {
-			fmt.Println("Invalid variable:", v)
+			fmt.Println(cout.Red("Invalid variable: " + v))
+			os.Exit(1)
 		}
 
 		kv := strings.Split(v, "=")
@@ -118,9 +120,9 @@ func main() {
 
 	e := engine.New(impulsar, addtitionalEnvVars)
 
-	fmt.Println("Execution plan ...")
+	fmt.Println(cout.DarkGray("Execution plan ..."))
 	for i := 0; i < flag.NArg(); i++ {
-		fmt.Println("-", flag.Arg(i))
+		fmt.Println(cout.DarkGray("- " + flag.Arg(i)))
 	}
 	fmt.Println("")
 

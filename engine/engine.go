@@ -3,6 +3,7 @@ package engine
 import (
 	"bufio"
 	"fmt"
+	"github.com/aimotrens/impulsar/cout"
 	"os"
 	"runtime"
 	"strings"
@@ -92,19 +93,19 @@ func (e *Engine) executeJob(j *model.Job) {
 				os.Exit(1)
 			}
 
-			scriptPrint := strings.ReplaceAll(
-				strings.Trim(script, "\n"),
-				"\n",
-				"; ")
+			scriptPrint := ""
+			for _, s := range strings.Split(script, "\n") {
+				scriptPrint += strings.Trim(s, " ") + "; "
+			}
 
 			if len(scriptPrint) > 81 {
 				scriptPrint = scriptPrint[0:50] + " . . . . . " + scriptPrint[len(scriptPrint)-20:]
 			}
 
-			fmt.Printf("[%s] (%s) %s\n",
-				j.Name,
-				scriptPrint,
-				suffix,
+			fmt.Printf(
+				cout.Green(cout.Bold("["+j.Name+"] ")) +
+					"(" + scriptPrint + ") " +
+					cout.Blue(suffix) + "\n",
 			)
 
 			if err := e.execCommand(j, script); err != nil {
@@ -278,9 +279,20 @@ func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 		}
 
 		if argDef.Allowed == nil {
-			fmt.Printf("[%s] %s (%s) [%s]: ", j.Name, name, argDef.Description, argDef.Default)
+			fmt.Printf("%s %s (%s) [%s]: ",
+				cout.Green(cout.Bold("["+j.Name+"]")),
+				cout.Gray(name),
+				argDef.Description,
+				cout.LightYellow(argDef.Default),
+			)
 		} else {
-			fmt.Printf("[%s] %s (%s) [%s] {%s}: ", j.Name, name, argDef.Description, argDef.Default, strings.Join(argDef.Allowed, ", "))
+			fmt.Printf("%s %s (%s) [%s] {%s}: ",
+				cout.Green(cout.Bold("["+j.Name+"]")),
+				cout.Gray(name),
+				argDef.Description,
+				cout.LightYellow(argDef.Default),
+				strings.Join(argDef.Allowed, ", "),
+			)
 		}
 
 		var value string
@@ -304,7 +316,7 @@ func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 			}
 
 			if !isAllowedValue {
-				fmt.Printf("Value %s not allowed\n", value)
+				fmt.Printf(cout.Red("Value %s not allowed\n"), value)
 				os.Exit(1)
 			}
 		}
