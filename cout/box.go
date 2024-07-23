@@ -6,20 +6,48 @@ import (
 
 // Box
 const (
-	TopLeft     = "┌"
-	TopRight    = "┐"
-	BottomLeft  = "└"
-	BottomRight = "┘"
-	Horizontal  = "─"
-	Vertical    = "│"
+	horizontal = "─"
+	vertical   = "│"
+
+	topLeftSquare     = "┌"
+	topRightSquare    = "┐"
+	bottomLeftSquare  = "└"
+	bottomRightSquare = "┘"
+
+	topLeftRound     = "╭"
+	topRightRound    = "╮"
+	bottomLeftRound  = "╰"
+	bottomRightRound = "╯"
+
+	// ---
+
+	horizontalDouble = "═"
+	verticalDouble   = "║"
+
+	topLeftDouble     = "╔"
+	topRightDouble    = "╗"
+	bottomLeftDouble  = "╚"
+	bottomRightDouble = "╝"
 )
 
-func H1(s string) string {
+func Box(s string) string {
+	return box(s, topLeftSquare, topRightSquare, bottomLeftSquare, bottomRightSquare, horizontal, vertical)
+}
+
+func BoxRoundCorner(s string) string {
+	return box(s, topLeftRound, topRightRound, bottomLeftRound, bottomRightRound, horizontal, vertical)
+}
+
+func BoxDouble(s string) string {
+	return box(s, topLeftDouble, topRightDouble, bottomLeftDouble, bottomRightDouble, horizontalDouble, verticalDouble)
+}
+
+func box(s, topLeft, topRight, bottomLeft, bottomRight, horizontal, vertical string) string {
 	sLen := len(s)
 
-	res := TopLeft + strings.Repeat(Horizontal, sLen+2) + TopRight + "\n"
-	res += Vertical + " " + s + " " + Vertical + "\n"
-	res += BottomLeft + strings.Repeat(Horizontal, sLen+2) + BottomRight + "\n"
+	res := topLeft + strings.Repeat(horizontal, sLen+2) + topRight + "\n"
+	res += vertical + " " + s + " " + vertical + "\n"
+	res += bottomLeft + strings.Repeat(horizontal, sLen+2) + bottomRight + "\n"
 
 	return res
 }

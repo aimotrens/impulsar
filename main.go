@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/aimotrens/impulsar/cout"
 	"io"
 	"os"
 	"runtime"
 	"strings"
+
+	"github.com/aimotrens/impulsar/cout"
 
 	"github.com/aimotrens/impulsar/engine"
 	_ "github.com/aimotrens/impulsar/engine/docker_executor"
@@ -59,7 +60,8 @@ func main() {
 	flag.Parse()
 
 	if version {
-		fmt.Printf("Impulsar %s\nCompiled at %s with %s\n\n", impulsarVersion, compileDate, runtime.Version())
+		fmt.Println(cout.Bold("Impulsar " + impulsarVersion))
+		fmt.Printf("Compiled at %s with %s\n\n", compileDate, cout.Cyan(runtime.Version()))
 		os.Exit(0)
 	}
 
@@ -79,14 +81,14 @@ func main() {
 	}
 
 	if showJobs {
-		impulsar := loadimpulsarFile(impulsarFile)
+		impulsar := loadImpulsarFile(impulsarFile)
 		for key := range impulsar {
 			fmt.Println(key)
 		}
 		os.Exit(0)
 	}
 
-	fmt.Printf(cout.Bold(fmt.Sprintf("Impulsar %s\n", impulsarVersion)))
+	fmt.Print(cout.Bold(fmt.Sprintf("Impulsar %s\n", impulsarVersion)))
 
 	if flag.NArg() == 0 {
 		fmt.Println(cout.Yellow("No jobs provided"))
@@ -105,7 +107,7 @@ func main() {
 		addtitionalEnvVars[kv[0]] = kv[1]
 	}
 
-	impulsar := loadimpulsarFile(impulsarFile)
+	impulsar := loadImpulsarFile(impulsarFile)
 	for key, job := range impulsar {
 		job.Name = key
 		job.SetDefaults()
@@ -120,11 +122,13 @@ func main() {
 
 	e := engine.New(impulsar, addtitionalEnvVars)
 
-	fmt.Println(cout.DarkGray("Execution plan ..."))
-	for i := 0; i < flag.NArg(); i++ {
-		fmt.Println(cout.DarkGray("- " + flag.Arg(i)))
-	}
-	fmt.Println("")
+	fmt.Print(cout.FormattingArea(cout.DarkGray, func(b *strings.Builder) {
+		fmt.Fprintln(b, "Execution plan ...")
+		for i := 0; i < flag.NArg(); i++ {
+			fmt.Fprintln(b, "- "+flag.Arg(i))
+		}
+		fmt.Fprintln(b, "")
+	}))
 
 	// Alle Job-Argumente sammeln
 	for i := 0; i < flag.NArg(); i++ {
@@ -137,7 +141,7 @@ func main() {
 	}
 }
 
-func loadimpulsarFile(impulsarFile string) map[string]*model.Job {
+func loadImpulsarFile(impulsarFile string) map[string]*model.Job {
 	f, err := os.Open(impulsarFile)
 	if err != nil {
 		panic(err)

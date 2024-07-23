@@ -3,10 +3,11 @@ package engine
 import (
 	"bufio"
 	"fmt"
-	"github.com/aimotrens/impulsar/cout"
 	"os"
 	"runtime"
 	"strings"
+
+	"github.com/aimotrens/impulsar/cout"
 
 	"github.com/aimotrens/impulsar/model"
 )
@@ -97,6 +98,8 @@ func (e *Engine) executeJob(j *model.Job) {
 			for _, s := range strings.Split(script, "\n") {
 				scriptPrint += strings.Trim(s, " ") + "; "
 			}
+
+			scriptPrint = strings.Trim(scriptPrint, " ;")
 
 			if len(scriptPrint) > 81 {
 				scriptPrint = scriptPrint[0:50] + " . . . . . " + scriptPrint[len(scriptPrint)-20:]
@@ -291,7 +294,7 @@ func (e *Engine) readArgsIntoJobVars(j *model.Job) {
 				cout.Gray(name),
 				argDef.Description,
 				cout.LightYellow(argDef.Default),
-				strings.Join(argDef.Allowed, ", "),
+				cout.FormatByText(strings.Join(argDef.Allowed, ", "), argDef.Default, cout.Italic),
 			)
 		}
 
