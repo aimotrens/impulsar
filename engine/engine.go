@@ -105,7 +105,7 @@ func (e *Engine) executeJob(j *model.Job) {
 				scriptPrint = scriptPrint[0:50] + " . . . . . " + scriptPrint[len(scriptPrint)-20:]
 			}
 
-			fmt.Printf(
+			fmt.Print(
 				cout.Green(cout.Bold("["+j.Name+"] ")) +
 					"(" + scriptPrint + ") " +
 					cout.Blue(suffix) + "\n",
