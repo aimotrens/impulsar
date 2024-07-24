@@ -24,7 +24,7 @@ func main() {
 		fmt.Println("  " + cmd.ColorizeCmd("show-jobs") + " - Show impulsar jobs")
 		fmt.Println("  " + cmd.ColorizeCmd("version") + " - Show impulsar version")
 
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	command()
