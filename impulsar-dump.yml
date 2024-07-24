@@ -1,0 +1,35 @@
+dev:
+    shell:
+        type: bash
+        image: ""
+        uidGid: ""
+        bootCommand:
+            - bash
+            - -c
+        server: ""
+    if: []
+    conditional: []
+    allowFail: false
+    workDir: .
+    jobs:pre: []
+    jobs:post: []
+    jobs:finalize: []
+    script:pre: []
+    script:
+        - echo {{.FOO}} und {{.VAR1}} {{.VAR2}}
+    script:post: []
+    script:finalize: []
+    variables: {}
+    variablesExcluded: []
+    foreach:
+        - VAR1: Zonk
+          VAR2: Huber
+        - VAR1: Zopper
+          VAR2: Zopp
+    arguments:
+        FOO:
+            description: Foo
+            default: baz
+            allowed:
+                - bar
+                - baz

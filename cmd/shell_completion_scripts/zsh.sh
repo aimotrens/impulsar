@@ -2,7 +2,7 @@
 
 _impulsar_jobs() {
   local jobs
-  jobs=($(impulsar --show-jobs))
+  jobs=($(impulsar show-jobs))
   _describe 'jobs' jobs
 }
 
