@@ -20,10 +20,10 @@ build:
     - |
       {{if eq .OS "windows"}}
         New-Item -Type Directory -Force release/{{.GOOS}}_{{.GOARCH}}
-        go build -o release/{{.GOOS}}_{{.GOARCH}}/impulsar{{.EXE_SUFFIX}} -ldflags "-X `"main.impulsarVersion={{.IMPULSAR_VERSION}}`" ` -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
+        go build -o release/{{.GOOS}}_{{.GOARCH}}/impulsar{{.EXE_SUFFIX}} -ldflags "-X `"main.impulsarVersion={{.IMPULSAR_VERSION}}`" ` -X `"main.compileDate=$(Get-Date +UFormat %s)`""
       {{else if eq .OS "linux"}}
         mkdir -p release/{{.GOOS}}_{{.GOARCH}}
-        go build -o release/{{.GOOS}}_{{.GOARCH}}/impulsar{{.EXE_SUFFIX}} -ldflags "-X \"main.impulsarVersion={{.IMPULSAR_VERSION}}\" -X \"main.compileDate=$(date)\""
+        go build -o release/{{.GOOS}}_{{.GOARCH}}/impulsar{{.EXE_SUFFIX}} -ldflags "-X \"main.impulsarVersion={{.IMPULSAR_VERSION}}\" -X \"main.compileDate=$(date +%s)\""
       {{else}}
         echo "Unknown Platform"
         STOP
@@ -63,15 +63,11 @@ install:
 install-on-linux:
   if:
     - OS: linux
-  variables:
-    IMPULSAR_VERSION: vX.X.X-dev
   script:
-    - go install -ldflags "-X \"main.impulsarVersion={{.IMPULSAR_VERSION}}\" -X \"main.compileDate=$(date)\""
+    - go install -ldflags "-X \"main.compileDate=$(date +%s)\""
 
 install-on-windows:
   if:
     - OS: windows
-  variables:
-    IMPULSAR_VERSION: vX.X.X-dev
   script:
-    - go install -ldflags "-X `"main.impulsarVersion={{.IMPULSAR_VERSION}}`" -X `"main.compileDate=$((get-date).ToString('dd.MM.yyyy'))`""
+    - go install -ldflags "-X `"main.compileDate=$(Get-Date +UFormat %s)`""

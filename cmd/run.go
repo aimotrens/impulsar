@@ -18,7 +18,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func run(fl flagLoader) {
+func run(fl flagLoader, buildInfo BuildInfoProvider) {
+	_, impulsarVersion := buildInfo()
+
 	var impulsarFile string
 	var envVars model.FlagArray
 	var dumpJobs bool

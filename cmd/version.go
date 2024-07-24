@@ -5,31 +5,25 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
+	"time"
 
 	"github.com/aimotrens/impulsar/cout"
 )
 
-var (
-	compileDate     string
-	impulsarVersion string
-)
-
-func version(fl flagLoader) {
+func version(fl flagLoader, buildInfo BuildInfoProvider) {
 	fl(func(fs *flag.FlagSet) {
 		fs.Usage = noFlagsUsage("version")
 	})
 
-	v := impulsarVersion
-	if v == "" {
-		v = "x.x.x"
+	compileDate, impulsarVersion := buildInfo()
+	compileTime := "unknown"
+
+	if seconds, err := strconv.ParseInt(compileDate, 10, 64); err == nil {
+		compileTime = time.Unix(seconds, 0).Format(time.RFC1123)
 	}
 
-	cd := compileDate
-	if cd == "" {
-		cd = "unknown"
-	}
-
-	fmt.Println(cout.Bold("Impulsar " + v))
-	fmt.Printf("Compiled at %s with %s\n\n", cd, cout.Cyan(runtime.Version()))
+	fmt.Println(cout.Bold("Impulsar " + impulsarVersion))
+	fmt.Printf("Compiled at %s with %s\n\n", compileTime, cout.Cyan(runtime.Version()))
 	os.Exit(0)
 }

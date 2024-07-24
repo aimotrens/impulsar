@@ -7,10 +7,11 @@ import (
 	"github.com/aimotrens/impulsar/cout"
 )
 
+type BuildInfoProvider func() (compileDate string, impulsarVersion string)
 type flagLoader func(flagDefiner) *flag.FlagSet
 type flagDefiner func(*flag.FlagSet)
 
-func Dispatch(args []string) func() {
+func Dispatch(args []string, buildInfo BuildInfoProvider) func() {
 	if len(args) < 1 {
 		return nil
 	}
@@ -23,18 +24,18 @@ func Dispatch(args []string) func() {
 	})
 
 	switch args[0] {
-	case "version":
-		return func() { version(fl) }
 	case "run":
-		return func() { run(fl) }
+		return func() { run(fl, buildInfo) }
 	case "gen":
 		return func() { genCompletionScript(fl) }
 	case "show-jobs":
 		return func() { showJobs(fl) }
+	case "version":
+		return func() { version(fl, buildInfo) }
 	default:
 		return func() {
 			args = append([]string{"run"}, args...)
-			run(fl)
+			run(fl, buildInfo)
 		}
 	}
 }
