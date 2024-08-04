@@ -93,12 +93,12 @@ func run(fl flagLoader, buildInfo BuildInfoProvider) {
 		return
 	}
 
-	// Alle Job-Argumente sammeln
+	// collect all arguments
 	for i := 0; i < runFlags.NArg(); i++ {
 		e.CollectArgs(runFlags.Arg(i))
 	}
 
-	// Alle Jobs ausführen
+	// run all jobs
 	for i := 0; i < runFlags.NArg(); i++ {
 		e.RunJob(runFlags.Arg(i))
 	}

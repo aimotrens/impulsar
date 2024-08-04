@@ -34,6 +34,8 @@ func Dispatch(args []string, buildInfo BuildInfoProvider) func() {
 		return func() { version(fl, buildInfo) }
 	default:
 		return func() {
+			// prepend "run" to args
+			// a bit ugly, but the new args variable is captured by the closure (fl) above from this switch
 			args = append([]string{"run"}, args...)
 			run(fl, buildInfo)
 		}

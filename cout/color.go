@@ -1,6 +1,6 @@
 package cout
 
-// Farben
+// Color definitions
 const (
 	yellow      = "\033[33m"
 	orange      = "\033[38;5;208m"
