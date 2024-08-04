@@ -24,6 +24,7 @@ func run(fl flagLoader, buildInfo BuildInfoProvider) {
 	var impulsarFile string
 	var envVars model.FlagArray
 	var dumpJobs bool
+	var dryrun bool
 
 	runFlags := fl(func(fs *flag.FlagSet) {
 		fs.Usage = func() {
@@ -34,6 +35,7 @@ func run(fl flagLoader, buildInfo BuildInfoProvider) {
 		fs.StringVar(&impulsarFile, "f", "./impulsar.yml", "impulsar file")
 		fs.Var(&envVars, "e", "additional environment variables")
 		fs.BoolVar(&dumpJobs, "dump-jobs", false, "dump parsed jobs to impulsar-dump.yml")
+		fs.BoolVar(&dryrun, "dryrun", false, "dryrun, only show execution plan")
 	})
 
 	fmt.Print(cout.Bold(fmt.Sprintf("Impulsar %s\n", impulsarVersion)))
@@ -70,13 +72,26 @@ func run(fl flagLoader, buildInfo BuildInfoProvider) {
 
 	e := engine.New(impulsar, addtitionalEnvVars)
 
-	fmt.Print(cout.FormattingArea(cout.DarkGray, func(b *strings.Builder) {
+	var plan string
+	var canExecute bool
+	fmt.Print(cout.FormattingArea(nil, func(b *strings.Builder) {
 		fmt.Fprintln(b, "Execution plan ...")
-		for i := 0; i < runFlags.NArg(); i++ {
-			fmt.Fprintln(b, "- "+runFlags.Arg(i))
-		}
+
+		plan, canExecute = buildExecutionPlan(e, runFlags.Args())
+		fmt.Fprintln(b, plan)
+		fmt.Fprintln(b)
+
 		fmt.Fprintln(b, "")
 	}))
+
+	if !canExecute {
+		fmt.Println(cout.Red("Execution plan is invalid, see above"))
+		os.Exit(1)
+	}
+
+	if dryrun {
+		return
+	}
 
 	// Alle Job-Argumente sammeln
 	for i := 0; i < runFlags.NArg(); i++ {

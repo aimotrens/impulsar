@@ -20,6 +20,11 @@ func Multi(fm ...FontModifier) FontModifier {
 func FormattingArea(fm FontModifier, f func(*strings.Builder)) string {
 	builder := new(strings.Builder)
 	f(builder)
+
+	if fm == nil {
+		return builder.String()
+	}
+
 	return fm(builder.String())
 }
 

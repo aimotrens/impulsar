@@ -50,3 +50,8 @@ func New(jobList map[string]*model.Job, additionalEnvVars model.VariableMap) *En
 
 	return e
 }
+
+func (e *Engine) GetJob(name string) (j *model.Job, ok bool) {
+	j, ok = e.jobList[name]
+	return
+}
