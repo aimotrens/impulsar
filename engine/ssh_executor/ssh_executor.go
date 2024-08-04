@@ -56,8 +56,7 @@ func (e *SshExecutor) Execute(j *model.Job, script string) error {
 	}
 	defer session.Close()
 
-	session.Stdout = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
-	session.Stderr = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
+	session.Stdout, session.Stderr = engine.GetCmdOutputTarget(j)
 
 	scriptExpanded := e.ExpandVarsWithTemplateEngine(script, j)
 	scriptExpanded = os.Expand(scriptExpanded, e.LookupVarFunc(j))

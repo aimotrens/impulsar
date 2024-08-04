@@ -60,8 +60,7 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) error {
 	args = append(args, scriptExpanded)
 
 	cmd := exec.Command("docker", args...)
-	cmd.Stdout = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
-	cmd.Stderr = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
+	cmd.Stdout, cmd.Stderr = engine.GetCmdOutputTarget(j)
 	err := cmd.Run()
 
 	if err != nil {

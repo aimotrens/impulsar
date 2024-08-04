@@ -3,9 +3,7 @@ package engine
 import (
 	"fmt"
 	"os"
-	"strings"
 
-	"github.com/aimotrens/impulsar/cout"
 	"github.com/aimotrens/impulsar/model"
 )
 
@@ -21,40 +19,8 @@ func (e *Engine) RunJob(job string) {
 func (e *Engine) executeJob(j *model.Job) {
 	e.evaluateConditionalField(j)
 
-	runScriptBlock := func(scriptBlock []string, suffix string) error {
-		for _, script := range scriptBlock {
-			if script == "STOP" {
-				fmt.Printf("Job %s failed, due to STOP command\n", j.Name)
-				os.Exit(1)
-			}
-
-			scriptPrint := ""
-			for _, s := range strings.Split(script, "\n") {
-				scriptPrint += strings.Trim(s, " ") + "; "
-			}
-
-			scriptPrint = strings.Trim(scriptPrint, " ;")
-
-			if len(scriptPrint) > 81 {
-				scriptPrint = scriptPrint[0:50] + " . . . . . " + scriptPrint[len(scriptPrint)-20:]
-			}
-
-			fmt.Print(
-				cout.Green(cout.Bold("["+j.Name+"] ")) +
-					"(" + scriptPrint + ") " +
-					cout.Blue(suffix) + "\n",
-			)
-
-			if err := e.execCommand(j, script); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-
 	exitWithFinalizer := func() {
-		_ = runScriptBlock(j.ScriptFinalize, "via script:finalize")
+		_ = e.runScriptBlock(j, j.ScriptFinalize, "via script:finalize")
 
 		for _, finalize := range j.JobsFinalize {
 			e.RunJob(finalize)
@@ -69,7 +35,7 @@ func (e *Engine) executeJob(j *model.Job) {
 		}
 
 		if j.ScriptPre != nil {
-			if err := runScriptBlock(j.ScriptPre, "via script:pre"); err != nil {
+			if err := e.runScriptBlock(j, j.ScriptPre, "via script:pre"); err != nil {
 				exitWithFinalizer()
 			}
 		}
@@ -80,24 +46,24 @@ func (e *Engine) executeJob(j *model.Job) {
 					e.Variables[k] = v
 				}
 
-				if err := runScriptBlock(j.Script, "via foreach"); err != nil {
+				if err := e.runScriptBlock(j, j.Script, "via foreach"); err != nil {
 					exitWithFinalizer()
 				}
 			}
 		} else {
-			if err := runScriptBlock(j.Script, ""); err != nil {
+			if err := e.runScriptBlock(j, j.Script, ""); err != nil {
 				exitWithFinalizer()
 			}
 		}
 
 		if j.ScriptPost != nil {
-			if err := runScriptBlock(j.ScriptPost, "via script:post"); err != nil {
+			if err := e.runScriptBlock(j, j.ScriptPost, "via script:post"); err != nil {
 				exitWithFinalizer()
 			}
 		}
 
 		if j.ScriptFinalize != nil {
-			_ = runScriptBlock(j.ScriptFinalize, "view script:finalize")
+			_ = e.runScriptBlock(j, j.ScriptFinalize, "view script:finalize")
 		}
 
 		for _, post := range j.JobsPost {

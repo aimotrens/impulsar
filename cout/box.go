@@ -43,11 +43,26 @@ func BoxDouble(s string) string {
 }
 
 func box(s, topLeft, topRight, bottomLeft, bottomRight, horizontal, vertical string) string {
-	sLen := len(s)
+	sLen := lenOfLargestLine(s)
 
 	res := topLeft + strings.Repeat(horizontal, sLen+2) + topRight + "\n"
-	res += vertical + " " + s + " " + vertical + "\n"
+	for _, line := range strings.Split(s, "\n") {
+		res += vertical + " " + line + strings.Repeat(" ", sLen-len(line)) + " " + vertical + "\n"
+	}
 	res += bottomLeft + strings.Repeat(horizontal, sLen+2) + bottomRight + "\n"
 
 	return res
+}
+
+func lenOfLargestLine(s string) int {
+	lines := strings.Split(s, "\n")
+
+	max := 0
+	for _, line := range lines {
+		if len(line) > max {
+			max = len(line)
+		}
+	}
+
+	return max
 }

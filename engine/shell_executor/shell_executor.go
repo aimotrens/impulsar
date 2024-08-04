@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
-	"slices"
-	"strings"
 
 	"github.com/aimotrens/impulsar/engine"
 	"github.com/aimotrens/impulsar/model"
@@ -32,38 +29,9 @@ func (e *ShellExecutor) Execute(j *model.Job, script string) error {
 	scriptExpanded = os.Expand(scriptExpanded, e.LookupVarFunc(j))
 
 	cmd := exec.Command(j.Shell.BootCommand[0], append(j.Shell.BootCommand[1:], scriptExpanded)...)
-	cmd.Stdout = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stdout}
-	cmd.Stderr = &engine.JobOutputUnifier{Job: j, ScriptLine: &script, Writer: os.Stderr}
+	cmd.Stdout, cmd.Stderr = engine.GetCmdOutputTarget(j)
 
-	for key, value := range e.Variables {
-		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
-	}
-
-	for key, value := range j.Variables {
-		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
-	}
-
-	if runtime.GOOS == "windows" && j.Shell.Type == model.SHELL_TYPE_BASH {
-		var wslEnv []string
-
-		for key := range e.Variables {
-			if key == "PATH" {
-				continue
-			}
-
-			if j.VariablesExcluded != nil && slices.Contains(j.VariablesExcluded, key) {
-				continue
-			}
-
-			wslEnv = append(wslEnv, key+"/u")
-		}
-
-		for key := range j.Variables {
-			wslEnv = append(wslEnv, key+"/u")
-		}
-
-		cmd.Env = append(cmd.Env, "WSLENV="+strings.Join(wslEnv, ":"))
-	}
+	e.prepareCmdEnv(j, cmd)
 
 	cmd.Dir = j.WorkDir
 
