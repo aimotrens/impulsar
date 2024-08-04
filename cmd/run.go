@@ -28,12 +28,12 @@ func run(fl flagLoader, buildInfo BuildInfoProvider) {
 
 	runFlags := fl(func(fs *flag.FlagSet) {
 		fs.Usage = func() {
-			fmt.Println("Usage: impulsar " + ColorizeCmd("run") + " [-f <impulsar file>] [-e <key=value>]... [-dump-jobs] <job>...")
+			fmt.Println("Usage: impulsar " + ColorizeCmd("run") + " [-f <impulsar file>] [-e <name=value>]... [-dump-jobs] <job>...")
 			fs.PrintDefaults()
 		}
 
 		fs.StringVar(&impulsarFile, "f", "./impulsar.yml", "impulsar file")
-		fs.Var(&envVars, "e", "additional environment variables")
+		fs.Var(&envVars, "e", "additional environment variables (format: name=value)")
 		fs.BoolVar(&dumpJobs, "dump-jobs", false, "dump parsed jobs to impulsar-dump.yml")
 		fs.BoolVar(&dryrun, "dryrun", false, "dryrun, only show execution plan")
 	})
