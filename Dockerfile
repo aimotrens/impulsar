@@ -7,7 +7,7 @@ ADD go.mod go.sum ./
 RUN go mod download
 
 ADD . .
-RUN go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date)\"" -o impulsar
+RUN go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main.compileDate=$(date +%s)\"" -o impulsar
 
 # ---
 
