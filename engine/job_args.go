@@ -12,7 +12,7 @@ import (
 
 // Collects all arguments for a job recursively
 func (e *Engine) CollectArgs(job string) {
-	if j, ok := e.jobList[job]; ok {
+	if j, ok := e.GetJob(job); ok {
 		e.readArgsIntoJobVars(j)
 
 		for _, pre := range j.JobsPre {

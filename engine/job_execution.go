@@ -8,7 +8,7 @@ import (
 )
 
 func (e *Engine) RunJob(job string) {
-	if scheduledJob, ok := e.jobList[job]; ok {
+	if scheduledJob, ok := e.GetJob(job); ok {
 		e.executeJob(scheduledJob)
 		return
 	}
