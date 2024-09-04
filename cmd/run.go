@@ -3,7 +3,6 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
@@ -110,10 +109,8 @@ func loadImpulsarFile(impulsarFile string) map[string]*model.Job {
 		panic(err)
 	}
 
-	yData, _ := io.ReadAll(f)
-
 	var impulsar map[string]*model.Job
-	dec := yaml.NewDecoder(strings.NewReader(string(yData)))
+	dec := yaml.NewDecoder(f)
 	dec.KnownFields(true)
 
 	err = dec.Decode(&impulsar)
