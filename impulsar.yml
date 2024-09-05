@@ -20,7 +20,7 @@ build:
     - |
       {{if eq .OS "windows"}}
         New-Item -Type Directory -Force release/{{.GOOS}}_{{.GOARCH}}
-        go build -o release/{{.GOOS}}_{{.GOARCH}}/impulsar{{.EXE_SUFFIX}} -ldflags "-X `"main.impulsarVersion={{.IMPULSAR_VERSION}}`" ` -X `"main.compileDate=$(Get-Date +UFormat %s)`""
+        go build -o release/{{.GOOS}}_{{.GOARCH}}/impulsar{{.EXE_SUFFIX}} -ldflags "-X `"main.impulsarVersion={{.IMPULSAR_VERSION}}`" ` -X `"main.compileDate=$(Get-Date -UFormat %s)`""
       {{else if eq .OS "linux"}}
         mkdir -p release/{{.GOOS}}_{{.GOARCH}}
         go build -o release/{{.GOOS}}_{{.GOARCH}}/impulsar{{.EXE_SUFFIX}} -ldflags "-X \"main.impulsarVersion={{.IMPULSAR_VERSION}}\" -X \"main.compileDate=$(date +%s)\""
@@ -67,7 +67,9 @@ install-on-linux:
     - go install -ldflags "-X \"main.compileDate=$(date +%s)\""
 
 install-on-windows:
+  shell:
+    type: pwsh
   if:
     - OS: windows
   script:
-    - go install -ldflags "-X `"main.compileDate=$(Get-Date +UFormat %s)`""
+    - go install -ldflags "-X `"main.compileDate=$(Get-Date -UFormat %s)`""
