@@ -11,7 +11,7 @@ RUN go build -ldflags "-X \"main.impulsarVersion=${IMPULSAR_VERSION}\" -X \"main
 
 # ---
 
-FROM alpine:3.20@sha256:e417839c51cd76908ea4ec131f132ac80a9e77d345d8a4dbc3ab2ab784f8ee6c
+FROM alpine:3.20@sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d
 
 COPY --from=builder /src/impulsar /usr/local/bin/impulsar
 
