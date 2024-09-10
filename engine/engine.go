@@ -29,7 +29,7 @@ func New(jobList map[string]*model.Job, additionalEnvVars model.VariableMap) *En
 	// Aggregate environment and additional variables
 	{
 		for _, v := range os.Environ() {
-			var kv = strings.Split(v, "=")
+			var kv = strings.SplitN(v, "=", 2)
 			envVars[kv[0]] = kv[1]
 		}
 
