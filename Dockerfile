@@ -1,4 +1,4 @@
-FROM golang:1.23@sha256:3a95a7febf5a68fadbec6b0d55de883f26d6b62792d5b0c4d17114d45d6123b4 AS builder
+FROM golang:1.23@sha256:4f063a24d429510e512cc730c3330292ff49f3ade3ae79bda8f84a24fa25ecb0 AS builder
 
 ARG IMPULSAR_VERSION
 
