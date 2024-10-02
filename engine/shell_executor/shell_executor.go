@@ -2,7 +2,6 @@ package shellexecutor
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 
 	"github.com/aimotrens/impulsar/engine"
@@ -26,7 +25,6 @@ func init() {
 
 func (e *ShellExecutor) Execute(j *model.Job, script string) error {
 	scriptExpanded := e.ExpandVarsWithTemplateEngine(script, j)
-	scriptExpanded = os.Expand(scriptExpanded, e.LookupVarFunc(j))
 
 	cmd := exec.Command(j.Shell.BootCommand[0], append(j.Shell.BootCommand[1:], scriptExpanded)...)
 	cmd.Stdout, cmd.Stderr = engine.GetCmdOutputTarget(j)

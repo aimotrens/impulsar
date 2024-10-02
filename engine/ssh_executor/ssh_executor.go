@@ -2,7 +2,6 @@ package sshexecutor
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 
@@ -59,7 +58,6 @@ func (e *SshExecutor) Execute(j *model.Job, script string) error {
 	session.Stdout, session.Stderr = engine.GetCmdOutputTarget(j)
 
 	scriptExpanded := e.ExpandVarsWithTemplateEngine(script, j)
-	scriptExpanded = os.Expand(scriptExpanded, e.LookupVarFunc(j))
 
 	err = session.Run(scriptExpanded)
 

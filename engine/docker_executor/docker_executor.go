@@ -53,7 +53,6 @@ func (e *DockerExecutor) Execute(j *model.Job, script string) error {
 	}
 
 	scriptExpanded := e.ExpandVarsWithTemplateEngine(script, j)
-	scriptExpanded = os.Expand(scriptExpanded, e.LookupVarFunc(j))
 
 	args = append(args, "--entrypoint", j.Shell.BootCommand[0], j.Shell.Image)
 	args = append(args, j.Shell.BootCommand[1:]...)
