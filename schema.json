@@ -317,6 +317,10 @@
         "server": {
           "type": "string",
           "description": "Der Server, auf dem der Befehl ausgeführt werden soll."
+        },
+        "interactive": {
+          "type": "boolean",
+          "description": "Gibt an, ob die Shell interaktiv sein soll."
         }
       }
     },
