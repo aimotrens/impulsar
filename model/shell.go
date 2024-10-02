@@ -17,6 +17,7 @@ type Shell struct {
 	UidGid      string   `yaml:"uidGid"`
 	BootCommand []string `yaml:"bootCommand"`
 	Server      string   `yaml:"server"`
+	Interactive bool     `yaml:"interactive"`
 }
 
 func (e *Shell) SetDefaults() {
@@ -39,6 +40,10 @@ func (e *Shell) SetDefaults() {
 			e.BootCommand = []string{"pwsh", "-Command"}
 		case "bash":
 			e.BootCommand = []string{"bash", "-c"}
+
+			if e.Interactive {
+				e.BootCommand = append(e.BootCommand, "-i")
+			}
 
 			if runtime.GOOS == "windows" {
 				e.BootCommand = append([]string{"wsl", "--exec"}, e.BootCommand...)
