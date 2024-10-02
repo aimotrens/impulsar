@@ -33,13 +33,13 @@ func (e *ShellExecutor) Execute(j *model.Job, script string) error {
 
 	cmd.Dir = j.WorkDir
 
-	err := cmd.Run()
+	err := runCmd(cmd, j.Shell.Interactive)
 
 	if err != nil {
-		fmt.Printf("Command %s failed:\n%s\n", script, err)
+		fmt.Printf("command %s failed:\n%s\n", script, err)
 
 		if !j.AllowFail {
-			return fmt.Errorf("Command %s failed:\n%s\n", script, err)
+			return fmt.Errorf("command %s failed:\n%s", script, err)
 		}
 	}
 
