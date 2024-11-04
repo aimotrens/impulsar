@@ -104,9 +104,16 @@ func run(fl flagLoader, buildInfo BuildInfoProvider) {
 }
 
 func loadImpulsarFile(impulsarFile string) map[string]*model.Job {
-	f, err := os.Open(impulsarFile)
-	if err != nil {
-		panic(err)
+	var f *os.File
+	var err error
+
+	if impulsarFile == "-" {
+		f = os.Stdin
+	} else {
+		f, err = os.Open(impulsarFile)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	var impulsar map[string]*model.Job
