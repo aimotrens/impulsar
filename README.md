@@ -30,7 +30,7 @@ hello:
 
 Run impulsar with the following command:
 ```bash
-impulsar hello
+impulsar run hello
 ```
 `hello` is the name of the job defined in the configuration file.
 
