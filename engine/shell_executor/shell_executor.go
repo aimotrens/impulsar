@@ -13,7 +13,7 @@ type ShellExecutor struct {
 }
 
 func init() {
-	constructor := func(e *engine.Engine) engine.Shell {
+	constructor := func(e *engine.Engine) engine.Executor {
 		return &ShellExecutor{Engine: e}
 	}
 

@@ -10,11 +10,11 @@ import (
 type (
 	Engine struct {
 		jobList   map[string]*model.Job
-		shellMap  map[string]Shell
+		shellMap  map[string]Executor
 		Variables model.VariableMap
 	}
 
-	ExecutorConstructor func(*Engine) Shell
+	ExecutorConstructor func(*Engine) Executor
 )
 
 var executorMap = make(map[string]ExecutorConstructor)
@@ -40,7 +40,7 @@ func New(jobList map[string]*model.Job, additionalEnvVars model.VariableMap) *En
 
 	e := &Engine{
 		jobList:   jobList,
-		shellMap:  make(map[string]Shell),
+		shellMap:  make(map[string]Executor),
 		Variables: envVars,
 	}
 

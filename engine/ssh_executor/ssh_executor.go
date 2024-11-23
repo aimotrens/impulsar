@@ -16,7 +16,7 @@ type SshExecutor struct {
 }
 
 func init() {
-	engine.RegisterExecutor(model.SHELL_TYPE_SSH, func(e *engine.Engine) engine.Shell {
+	engine.RegisterExecutor(model.SHELL_TYPE_SSH, func(e *engine.Engine) engine.Executor {
 		return &SshExecutor{Engine: e}
 	})
 }

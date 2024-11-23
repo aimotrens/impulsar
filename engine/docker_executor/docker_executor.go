@@ -17,7 +17,7 @@ type DockerExecutor struct {
 }
 
 func init() {
-	engine.RegisterExecutor(model.SHELL_TYPE_DOCKER, func(e *engine.Engine) engine.Shell {
+	engine.RegisterExecutor(model.SHELL_TYPE_DOCKER, func(e *engine.Engine) engine.Executor {
 		return &DockerExecutor{Engine: e}
 	})
 }
