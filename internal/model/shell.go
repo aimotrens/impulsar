@@ -1,6 +1,9 @@
 package model
 
-import "runtime"
+import (
+	"os/exec"
+	"runtime"
+)
 
 const (
 	SHELL_TYPE_POWERSHELL = "powershell"
@@ -24,6 +27,11 @@ func (e *Shell) SetDefaults() {
 		switch runtime.GOOS {
 		case "windows":
 			e.Type = "powershell"
+
+			// if pwsh exists, prefer it over powershell
+			if _, err := exec.LookPath("pwsh"); err == nil {
+				e.Type = "pwsh"
+			}
 		case "linux":
 			e.Type = "bash"
 		default:
@@ -34,9 +42,9 @@ func (e *Shell) SetDefaults() {
 	if e.BootCommand == nil {
 		switch e.Type {
 		case "powershell":
-			e.BootCommand = []string{"powershell", "-Command"}
+			e.BootCommand = []string{"powershell", "-noprofile", "-Command"}
 		case "pwsh":
-			e.BootCommand = []string{"pwsh", "-Command"}
+			e.BootCommand = []string{"pwsh", "-noprofile", "-Command"}
 		case "bash":
 			e.BootCommand = []string{"bash", "-c"}
 
